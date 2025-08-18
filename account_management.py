@@ -11,7 +11,7 @@ def rename_admin_account_wmi(new_name="JLKAdmin"):
         accounts = c.Win32_UserAccount(Name=current_admin_name)
         if not accounts:
             print(
-                f"계정 이름이 이미 '{current_admin_name}' 계정이 존재하지 않습니다. 이미 이름이 변경되었을 수 있습니다."
+                f"계정 이름이 이미 '{current_admin_name}' 계정이 존재하지 않습니다.\n이미 이름이 변경되었을 수 있습니다.\n"
             )
             return
 
@@ -19,7 +19,7 @@ def rename_admin_account_wmi(new_name="JLKAdmin"):
         admin_account.Rename(Name=new_name)
         print(f"계정 이름이 성공적으로 '{new_name}'로 변경되었습니다.\n")
     except Exception as e:
-        print(f"예상치 못한 오류 발생: {e}")
+        print(f"예상치 못한 오류 발생: {e}\n")
 
 
 # Guest 계정을 비활성화
@@ -31,9 +31,10 @@ def disable_guest_account():
             check=True,
             text=True,
             encoding="cp949",
+            stdout=subprocess.DEVNULL,
         )
         print("Guest 계정이 성공적으로 비활성화되었습니다.\n")
     except subprocess.CalledProcessError as e:
-        print(f"Guest 계정 비활성화 오류: {e.stderr.decode('cp949')}")
+        print(f"Guest 계정 비활성화 오류: {e.stderr.decode('cp949')}\n")
     except Exception as e:
-        print(f"예상치 못한 오류 발생: {e}")
+        print(f"예상치 못한 오류 발생: {e}\n")

@@ -15,10 +15,10 @@ def show_info():
     print(f"개발자: {__author__}")
     print("---------------------------------")
 
-    print("계정 관리")
-    print("1. Administrator 계정 이름 변경")
+    print("1. 계정 관리")
+    print("1.1. Administrator 계정 이름 변경")
     rename_admin_account_wmi()
-    print("2. Guest 계정 비활성화")
+    print("1.2. Guest 계정 비활성화")
     disable_guest_account()
 
     print("\n------------------------------------------------")
