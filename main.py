@@ -2,7 +2,6 @@ __version__ = "0.0.0"
 __author__ = "LEE SANG U"
 __project_name__ = "Windows Security Scanner"
 
-
 def show_info():
     """프로젝트 정보를 출력하는 함수"""
     print("---------------------------------")
