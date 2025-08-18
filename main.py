@@ -4,6 +4,7 @@ from account_management import (
     disable_guest_account,
     delete_unnecessary_users,
     set_lockout_threshold,
+    set_max_password_age,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -29,6 +30,8 @@ def show_info():
     delete_unnecessary_users()
     print("1.4. 계정 잠금 임계값 설정 (설정값: 5)")
     set_lockout_threshold()
+    print("1.5. 패스워드 최대 사용 기간 설정 (설정값: 90)")
+    set_max_password_age()
 
     print("------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
