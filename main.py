@@ -1,8 +1,13 @@
+from .utils import run_as_admin
+
+__project_name__ = "Windows Security Scanner"
 __version__ = "0.0.0"
 __author__ = "LEE SANG U"
-__project_name__ = "Windows Security Scanner"
+
 
 def show_info():
+    run_as_admin()
+
     """프로젝트 정보를 출력하는 함수"""
     print("---------------------------------")
     print(f"프로젝트명: {__project_name__}")
