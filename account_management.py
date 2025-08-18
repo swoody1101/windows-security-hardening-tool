@@ -98,7 +98,7 @@ def set_lockout_threshold():
             text=True,
             encoding="cp949",
         )
-        print("계정 잠금 임계값이 '5'로 성공적으로 설정되었습니다.")
+        print("계정 잠금 임계값이 '5'로 성공적으로 설정되었습니다.\n")
     except subprocess.CalledProcessError as e:
         print(f"계정 잠금 임계값 설정 오류: {e.stderr.strip()}")
         print(
