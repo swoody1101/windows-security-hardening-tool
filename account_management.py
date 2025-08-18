@@ -62,8 +62,9 @@ def delete_unnecessary_users():
         return
 
     print("불필요한 계정으로 감지된 계정 목록:")
+    print(user_list_to_delete)
     for user in user_list_to_delete:
-        confirm = input("위 계정들을 모두 삭제하시겠습니까? (y/n): ").lower()
+        confirm = input(f"'{user}' 계정을 삭제하시겠습니까? (y/n): ").lower()
         if confirm == "y":
             try:
                 subprocess.run(
