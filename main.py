@@ -1,4 +1,5 @@
 from .utils import run_as_admin
+from .account_management import rename_admin_account_wmi
 
 __project_name__ = "Windows Security Scanner"
 __version__ = "0.0.0"
@@ -14,6 +15,10 @@ def show_info():
     print(f"버전: {__version__}")
     print(f"개발자: {__author__}")
     print("---------------------------------")
+
+    print("계정 관리")
+    print("1. Administrator 계정 이름 변경")
+    rename_admin_account_wmi()
 
 
 def main():
