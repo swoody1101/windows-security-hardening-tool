@@ -131,3 +131,51 @@ def set_max_password_age():
         print("'net' 명령어를 찾을 수 없습니다. 시스템 PATH를 확인해 주세요.\n")
     except Exception as e:
         print(f"예기치 않은 오류가 발생했습니다: {e}\n")
+
+
+# 암호 사용 기간 제한 없음 비활성화 설정
+def disable_password_never_expires():
+    user_list = get_user_list()
+
+    # 내장 계정 및 변경된 관리자 계정 제외
+    built_in_accounts = [
+        "Administrator",
+        "Guest",
+        "DefaultAccount",
+        "WDAGUtilityAccount",
+        "JLKAdmin",
+        "jlk",
+    ]
+    user_list = [user for user in user_list if user not in built_in_accounts]
+
+    if not user_list:
+        print("시스템에 사용자 계정이 존재하지 않습니다.\n")
+        return
+
+    for user in user_list:
+        try:
+            print(f"'{user} 계정의 암호사용 기간 제한 없음 설정을 비활성화합니다.")
+            subprocess.run(
+                [
+                    "wmic",
+                    "useraccount",
+                    "where",
+                    f"name='{user}'",
+                    "set",
+                    "passwordexpires=true",
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                encoding="cp949",
+            )
+            print(
+                f"계정 '{user}'의 '암호 사용 기간 제한 없음' 설정이 비활성화되었습니다."
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"계정 '{user}'의 설정 변경 오류: {e.stderr.strip()}\n")
+        except Exception as e:
+            print(f"'{user}' 계정 처리 중 예기치 않은 오류 발생: {e}\n")
+
+    print()
+
