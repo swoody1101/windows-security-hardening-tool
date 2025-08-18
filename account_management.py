@@ -85,3 +85,26 @@ def delete_unnecessary_users():
             print(f"'{user}' 계정 삭제를 취소했습니다.")
 
     print("불필요한 계정 삭제를 완료했습니다.\n")
+
+
+# 계정 잠금 임계값 설정
+def set_lockout_threshold():
+    print("계정 잠금 임계값을 5로 설정합니다.")
+    try:
+        result = subprocess.run(
+            ["net", "accounts", "/lockoutthreshold:5"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print("계정 잠금 임계값이 '5'로 성공적으로 설정되었습니다.\n")
+    except subprocess.CalledProcessError as e:
+        print(f"계정 잠금 임계값 설정 오류: {e.stderr.strip()}")
+        print(
+            "오류 원인: 관리자 권한으로 실행되지 않았거나, 시스템 계정으로 실행할 수 없습니다."
+        )
+    except FileNotFoundError:
+        print("'net' 명령어를 찾을 수 없습니다. 시스템 PATH를 확인해 주세요.")
+    except Exception as e:
+        print(f"예기치 않은 오류가 발생했습니다: {e}")

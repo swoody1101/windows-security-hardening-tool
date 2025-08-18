@@ -3,6 +3,7 @@ from account_management import (
     rename_admin_account_wmi,
     disable_guest_account,
     delete_unnecessary_users,
+    set_lockout_threshold,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -26,8 +27,10 @@ def show_info():
     disable_guest_account()
     print("1.3. 불필요한 계정 제거")
     delete_unnecessary_users()
+    print("1.4. 계정 잠금 임계값 설정 (설정값: 5)")
+    set_lockout_threshold()
 
-    print("\n------------------------------------------------")
+    print("------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
     input("프로그램을 끝내려면 아무 키나 누르세요...")
 
