@@ -1,5 +1,5 @@
 from utils import run_as_admin
-from account_management import rename_admin_account_wmi
+from account_management import rename_admin_account_wmi, disable_guest_account
 
 __project_name__ = "Windows Security Scanner"
 __version__ = "0.0.0"
@@ -15,9 +15,11 @@ def show_info():
     print(f"개발자: {__author__}")
     print("---------------------------------")
 
-    print("계정 관리")
-    print("1. Administrator 계정 이름 변경")
+    print("1. 계정 관리")
+    print("1.1. Administrator 계정 이름 변경")
     rename_admin_account_wmi()
+    print("1.2. Guest 계정 비활성화")
+    disable_guest_account()
 
     print("\n------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
