@@ -7,6 +7,7 @@ from account_management import (
     set_max_password_age,
     disable_password_never_expires,
     disable_reversible_encryption,
+    revoke_unnecessary_admin_privileges,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -28,7 +29,7 @@ def show_info():
     rename_admin_account_wmi()
     print("1.2. Guest 계정 비활성화")
     disable_guest_account()
-    print("1.3. 불필요한 계정 제거")
+    print("1.3. 불필요한 사용자 계정 제거")
     delete_unnecessary_users()
     print("1.4. 계정 잠금 임계값 설정 (설정값: 5)")
     set_lockout_threshold()
@@ -38,6 +39,8 @@ def show_info():
     disable_password_never_expires()
     print("1.7. 해독 가능한 암호화 설정 비활성화")
     disable_reversible_encryption()
+    print("1.8. 불필요한 관리자 계정 관리자 권한 회수")
+    revoke_unnecessary_admin_privileges()
 
     print("------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
