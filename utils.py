@@ -40,7 +40,6 @@ def get_user_list():
         )
         output_lines = result.stdout.strip().split("\n")
 
-        # 필요한 부분만 파싱하여 계정 리스트 추출
         start_index = -1
         for i, line in enumerate(output_lines):
             if "-----" in line:
@@ -63,4 +62,41 @@ def get_user_list():
         return []
     except Exception as e:
         print(f"사용자 리스트 가져오기 오류: {e}")
+        return []
+
+
+# 관리자 그룹 계정 탐색
+def get_admin_list():
+    try:
+        result = subprocess.run(
+            ["net", "localgroup", "administrators"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        output_lines = result.stdout.strip().split("\n")
+
+        start_index = -1
+        for i, line in enumerate(output_lines):
+            if "-----" in line:
+                start_index = i
+                break
+
+        if start_index == -1:
+            return []
+
+        admin_list = []
+        for line in output_lines[start_index + 1 :]:
+            if not line.strip() or "명령을 잘 실행했습니다." in line:
+                break
+            admin_list.extend(line.split())
+
+        return admin_list
+
+    except subprocess.CalledProcessError as e:
+        print(f"명령어 실행 오류: {e}")
+        return []
+    except Exception as e:
+        print(f"관리자 리스트 가져오기 오류: {e}")
         return []
