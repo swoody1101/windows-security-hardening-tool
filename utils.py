@@ -28,7 +28,7 @@ def run_as_admin():
         sys.exit(1)
 
 
-# 계정 리스트 검색
+# 계정 리스트 탐색
 def get_user_list():
     try:
         result = subprocess.run(
@@ -99,4 +99,36 @@ def get_admin_list():
         return []
     except Exception as e:
         print(f"관리자 리스트 가져오기 오류: {e}")
+        return []
+
+
+# 공유 이름 목록 탐색
+def get_shared_name_list():
+    try:
+        result = subprocess.run(
+            ["net", "share"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+
+        output_lines = result.stdout.strip().splitlines()
+        share_name_list = []
+
+        for line in output_lines[2:]:
+            if "-----" in line or "명령" in line:
+                continue
+            words = line.split()
+            if words:
+                share_name = words[0]
+                share_name_list.append(share_name)
+
+        return share_name_list
+
+    except subprocess.CalledProcessError as e:
+        print(f"명령어 실행 오류: {e}")
+        return []
+    except Exception as e:
+        print(f"공유 이름 리스트 가져오기 오류: {e}")
         return []
