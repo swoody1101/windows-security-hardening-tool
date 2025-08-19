@@ -6,6 +6,7 @@ from account_management import (
     set_lockout_threshold,
     set_max_password_age,
     disable_password_never_expires,
+    disable_reversible_encryption,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -33,8 +34,10 @@ def show_info():
     set_lockout_threshold()
     print("1.5. 패스워드 최대 사용 기간 설정 (설정값: 90)")
     set_max_password_age()
-    print("1.6. 암호 사용 기간 제한 없음 제거 비활성화")
+    print("1.6. 암호 사용 기간 제한 없음 설정 비활성화")
     disable_password_never_expires()
+    print("1.7. 해독 가능한 암호화 설정 비활성화")
+    disable_reversible_encryption()
 
     print("------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
