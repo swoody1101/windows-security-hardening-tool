@@ -2,7 +2,7 @@ import subprocess
 import wmi
 import os
 
-from utils import get_user_list
+from utils import get_user_list, get_admin_list
 
 
 # Administrator 계정 이름을 JLKAdmin으로 변경
@@ -59,7 +59,7 @@ def delete_unnecessary_users():
     user_list_to_delete = [user for user in user_list if user not in built_in_accounts]
 
     if not user_list_to_delete:
-        print("삭제할 불필요한 계정이 없습니다.\n")
+        print("삭제할 불필요한 사용자 계정이 없습니다.\n")
         return
 
     print("불필요한 계정으로 감지된 계정 목록:")
@@ -241,3 +241,49 @@ def disable_reversible_encryption():
         jfm_path = os.path.join(desktop_path, "cfg.jfm")
         if os.path.exists(jfm_path):
             os.remove(jfm_path)
+
+
+# 관리자 그룹에 불필요한 계정 삭제
+def revoke_unnecessary_admin_privileges():
+    admin_list = get_admin_list()
+
+    # 내장 계정 및 변경된 관리자 계정 제외
+    safe_admin_accounts = [
+        "Administrator",
+        "JLKAdmin",
+        "jlk",
+    ]
+    unnecessary_admin_users = [
+        user for user in admin_list if user not in safe_admin_accounts
+    ]
+
+    if not unnecessary_admin_users:
+        print("삭제할 불필요한 관리자 계정이 없습니다.\n")
+        return
+
+    print("불필요한 관리자 계정 목록:")
+    print(unnecessary_admin_users)
+    for admin in unnecessary_admin_users:
+        confirm = input(
+            f"'{admin}'계정의 관리자 권한을 삭제하시겠습니까? (y/n): "
+        ).lower()
+        if confirm == "y":
+            try:
+                subprocess.run(
+                    ["net", "localgroup", "administrators", admin, "/del"],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    encoding="cp949",
+                )
+                print(f"'{admin}'계정의 관리자 권한이 성공적으로 회수되었습니다.")
+            except subprocess.CalledProcessError as e:
+                print(
+                    f"'{admin}' 관리자 권한 회수 오류: {e.stderr.decode('cp949', errors='ignore')}"
+                )
+            except Exception as e:
+                print(f"오류 발생: {e}")
+        else:
+            print(f"'{admin}'의 관리자 권한 회수를 취소했습니다.")
+
+    print("불필요한 관리자 권한 회수를 완료했습니다.\n")
