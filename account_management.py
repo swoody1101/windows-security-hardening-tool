@@ -243,7 +243,7 @@ def disable_reversible_encryption():
             os.remove(jfm_path)
 
 
-# 관리자 그룹에 불필요한 계정 삭제
+# 관리자 그룹에 불필요한 계정 권한 회수
 def revoke_unnecessary_admin_privileges():
     admin_list = get_admin_list()
 
