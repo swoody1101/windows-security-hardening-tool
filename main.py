@@ -12,6 +12,7 @@ from account_management import (
 from service_management import (
     restore_share_permissions,
     disable_default_shares,
+    set_netbios_options,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -52,6 +53,8 @@ def show_info():
     restore_share_permissions()
     print("2.2. 하드디스크 기본 공유 제거")
     disable_default_shares()
+    print("2.3. NetBIOS 바인딩 구동 점검")
+    set_netbios_options()
 
     print("------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
