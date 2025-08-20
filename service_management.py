@@ -132,3 +132,26 @@ def disable_default_shares():
 
     except Exception as e:
         print(f"오류가 발생했습니다: {e}\n")
+
+
+# NetbiosOptions 값을 2로 설정
+def set_netbios_options():
+    base_key_path = r"SYSTEM\CurrentControlSet\services\NetBT\Parameters\Interfaces"
+
+    try:
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            base_key_path,
+            0,
+            winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
+
+        winreg.SetValueEx(reg_key, "NetbiosOptions", 0, winreg.REG_DWORD, 2)
+
+        winreg.CloseKey(reg_key)
+        print(f"'etbiosOptions'를 '2'로 성공적으로 설정했습니다.\n")
+
+    except FileNotFoundError:
+        print(f"오류: 레지스트리 경로 '{base_key_path}'를 찾을 수 없습니다.\n")
+    except Exception as e:
+        print(f"NetbiosOptions 설정 중 오류가 발생했습니다: {e}\n")
