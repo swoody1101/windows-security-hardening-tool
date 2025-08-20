@@ -11,6 +11,7 @@ from account_management import (
 )
 from service_management import (
     restore_share_permissions,
+    disable_default_shares,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -45,10 +46,12 @@ def show_info():
     print("1.8. 불필요한 관리자 계정 관리자 권한 회수")
     revoke_unnecessary_admin_privileges()
     print()
-    
+
     print("2. 서비스 관리")
     print("2.1. 공유 권한 및 사용자 그룹 설정")
     restore_share_permissions()
+    print("2.2. 하드디스크 기본 공유 제거")
+    disable_default_shares()
 
     print("------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
