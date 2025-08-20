@@ -92,7 +92,7 @@ def delete_unnecessary_users():
 def set_lockout_threshold():
     print("계정 잠금 임계값을 5로 설정합니다.")
     try:
-        result = subprocess.run(
+        subprocess.run(
             ["net", "accounts", "/lockoutthreshold:5"],
             check=True,
             capture_output=True,
