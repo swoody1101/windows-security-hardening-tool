@@ -1,8 +1,9 @@
 import win32api
 import win32con
+import subprocess
 import sys
 import os
-import subprocess
+import re
 
 
 # 관리자 권한 확인 및 재실행
@@ -103,7 +104,7 @@ def get_admin_list():
 
 
 # 공유 이름 목록 탐색
-def get_shared_name_list():
+def get_share_name_list():
     try:
         result = subprocess.run(
             ["net", "share"],
@@ -132,3 +133,41 @@ def get_shared_name_list():
     except Exception as e:
         print(f"공유 이름 리스트 가져오기 오류: {e}")
         return []
+
+
+# 특정 공유의 사용자 권한을 탐색 및 딕셔너리 형태로 반환
+def get_share_permissions(share_name):
+    permissions = {}
+    path = ""
+    try:
+        result = subprocess.run(
+            ["net", "share", share_name],
+            capture_output=True,
+            text=True,
+            check=True,
+            encoding="cp949",
+        )
+        lines = result.stdout.splitlines()
+
+        permission_flag = False
+        for line in lines:
+            if "경로" in line:
+                parts = line.split(maxsplit=1)
+                if len(parts) > 1:
+                    path = parts[1].strip()
+                continue
+
+            if "사용 권한" in line or permission_flag:
+                if not permission_flag:
+                    line = line.split("사용 권한", 1)[1]
+                    permission_flag = True
+                match = re.search(r"([\w\s-]+), (READ|CHANGE|FULL)", line)
+                if match:
+                    user_or_group = match.group(1).strip()
+                    permission = match.group(2).strip()
+                    permissions[user_or_group] = permission
+
+        return permissions, path
+
+    except subprocess.CalledProcessError as e:
+        print(f"공유 권한 획득 오류: {e.stderr.strip()}\n")
