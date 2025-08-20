@@ -155,3 +155,32 @@ def set_netbios_options():
         print(f"오류: 레지스트리 경로 '{base_key_path}'를 찾을 수 없습니다.\n")
     except Exception as e:
         print(f"NetbiosOptions 설정 중 오류가 발생했습니다: {e}\n")
+
+
+# FTP 서비스 구동 확인 및 시작유형을 "사용 안 함"으로 설정
+def disable_ftp_service():
+    print("FTP 서비스를 중지합니다.")
+    try:
+        subprocess.run(
+            ["net", "stop", "ftpsvc"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print("FTP 서비스가 성공적으로 중지되었습니다.")
+    except subprocess.CalledProcessError as e:
+        print(f"FTP 서비스 중지 실패: {e.stderr.strip()}\n")
+
+    print("FTP 서비스의 시작 유형을 '사용 안 함'으로 설정합니다.")
+    try:
+        subprocess.run(
+            ["sc", "config", "ftpsvc", "start=", "disabled"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print("FTP 서비스의 시작 유형이 '사용 안 함'으로 설정되었습니다.\n")
+    except subprocess.CalledProcessError as e:
+        print(f"FTP 서비스 시작 유형 변경 실패: {e.stderr.strip()}\n")
