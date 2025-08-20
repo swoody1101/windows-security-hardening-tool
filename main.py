@@ -13,6 +13,7 @@ from service_management import (
     restore_share_permissions,
     disable_default_shares,
     set_netbios_options,
+    disable_ftp_service,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -55,6 +56,8 @@ def show_info():
     disable_default_shares()
     print("2.3. NetBIOS 바인딩 구동 점검")
     set_netbios_options()
+    print("2.4. FTP 서비스 구동 점검")
+    disable_ftp_service()
 
     print("------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
