@@ -1,7 +1,7 @@
 import subprocess
 import winreg
 
-from utils import get_share_name_list, get_share_permissions
+from utils import get_share_name_list, get_share_permissions, is_windows_server
 
 
 # 일반 폴더 Everyone 공유 권한 제거 및 저장된 권한 재부여 설정
@@ -170,7 +170,7 @@ def disable_ftp_service():
         )
         print("FTP 서비스가 성공적으로 중지되었습니다.")
     except subprocess.CalledProcessError as e:
-        print(f"FTP 서비스 중지 실패: {e.stderr.strip()}\n")
+        print(f"FTP 서비스 중지 실패: {e.stderr.strip()}")
 
     print("FTP 서비스의 시작 유형을 '사용 안 함'으로 설정합니다.")
     try:
@@ -184,3 +184,88 @@ def disable_ftp_service():
         print("FTP 서비스의 시작 유형이 '사용 안 함'으로 설정되었습니다.\n")
     except subprocess.CalledProcessError as e:
         print(f"FTP 서비스 시작 유형 변경 실패: {e.stderr.strip()}\n")
+
+
+# 모든 DNS 영역의 SecureSecondaries 값을 2로 설정
+def set_dns_zone_transfer():
+    base_key_path = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\DNS Server\Zones"
+
+    if is_windows_server():
+        print("현재 OS는 Windows Server입니다. DNS Zone Transfer 설정을 시작합니다.")
+    else:
+        print("현재 OS는 Windows Client입니다. 기능을 실행할 수 없습니다.\n")
+        return
+
+    try:
+        # 'Zones' 기본 키를 열어 DNS 영역들을 탐색합니다.
+        base_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            base_key_path,
+            0,
+            winreg.KEY_READ | winreg.KEY_WOW64_64KEY,
+        )
+
+        i = 0
+        while True:
+            try:
+                # 다음 DNS 영역 이름(서브키)을 가져옵니다.
+                zone_name = winreg.EnumKey(base_key, i)
+                zone_key_path = f"{base_key_path}\\{zone_name}"
+
+                # 값을 수정하기 위해 해당 영역 키를 엽니다.
+                zone_key = winreg.OpenKey(
+                    winreg.HKEY_LOCAL_MACHINE,
+                    zone_key_path,
+                    0,
+                    winreg.KEY_READ | winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+                )
+
+                # 현재 SecureSecondaries 값을 확인합니다.
+                try:
+                    current_value, _ = winreg.QueryValueEx(
+                        zone_key, "SecureSecondaries"
+                    )
+
+                    if current_value != 2:
+                        print(
+                            f"'{zone_name}' 영역: SecureSecondaries 값이 {current_value}이므로 2로 변경합니다."
+                        )
+                        winreg.SetValueEx(
+                            zone_key, "SecureSecondaries", 0, winreg.REG_DWORD, 2
+                        )
+                        print(f"'{zone_name}' 영역: 설정이 변경되었습니다.")
+                    else:
+                        print(
+                            f"'{zone_name}' 영역: SecureSecondaries 값이 이미 2이므로 양호합니다."
+                        )
+
+                except FileNotFoundError:
+                    # 'SecureSecondaries' 값이 없는 경우 새로 생성하고 2로 설정합니다.
+                    print(
+                        f"'{zone_name}' 영역: SecureSecondaries 값이 없어 새로 생성하고 2로 설정합니다."
+                    )
+                    winreg.SetValueEx(
+                        zone_key, "SecureSecondaries", 0, winreg.REG_DWORD, 2
+                    )
+                    print(f"'{zone_name}' 영역: 설정이 변경되었습니다.")
+
+                finally:
+                    winreg.CloseKey(zone_key)
+
+            except OSError:
+                # 더 이상 서브키가 없으면 루프를 종료합니다.
+                break
+            except Exception as e:
+                print(f"'{zone_name}' 영역 처리 중 오류 발생: {e}\n")
+            finally:
+                i += 1
+
+        winreg.CloseKey(base_key)
+        print("DNS Zone Transfer 설정을 종료합니다.\n")
+
+    except FileNotFoundError:
+        print(
+            f"오류: 레지스트리 경로 '{base_key_path}'를 찾을 수 없습니다. DNS 서버 역할이 설치되지 않았을 수 있습니다.\n"
+        )
+    except Exception as e:
+        print(f"예상치 못한 오류 발생: {e}\n")

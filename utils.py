@@ -1,5 +1,6 @@
 import win32api
 import win32con
+import winreg
 import subprocess
 import sys
 import os
@@ -171,3 +172,30 @@ def get_share_permissions(share_name):
 
     except subprocess.CalledProcessError as e:
         print(f"공유 권한 획득 오류: {e.stderr.strip()}\n")
+
+
+# Windows Server 유무 확인
+def is_windows_server():
+    # 레지스트리에서 ProductName을 확인하여 현재 OS가 Windows Server인지 검사합니다.
+    try:
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            r"SOFTWARE\Microsoft\Windows NT\CurrentVersion",
+            0,
+            winreg.KEY_READ | winreg.KEY_WOW64_64KEY,
+        )
+
+        product_name, _ = winreg.QueryValueEx(reg_key, "ProductName")
+        winreg.CloseKey(reg_key)
+
+        if "Server" in product_name:
+            return True
+        else:
+            return False
+
+    except FileNotFoundError:
+        print("오류: 레지스트리 키를 찾을 수 없습니다. OS 유형을 확인할 수 없습니다.\n")
+        return False
+    except Exception as e:
+        print(f"예상치 못한 오류가 발생했습니다: {e}\n")
+        return False

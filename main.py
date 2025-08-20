@@ -14,6 +14,7 @@ from service_management import (
     disable_default_shares,
     set_netbios_options,
     disable_ftp_service,
+    set_dns_zone_transfer,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -58,6 +59,8 @@ def show_info():
     set_netbios_options()
     print("2.4. FTP 서비스 구동 점검")
     disable_ftp_service()
+    print("2.5. DNS Zone Transfer 설정")
+    set_dns_zone_transfer()
 
     print("------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
