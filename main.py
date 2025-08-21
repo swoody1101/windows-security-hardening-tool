@@ -16,6 +16,9 @@ from service_management import (
     disable_ftp_service,
     set_dns_zone_transfer,
 )
+from log_management import (
+    disable_remote_registry_service,
+)
 
 __project_name__ = "Windows Security Scanner"
 __version__ = "0.0.0"
@@ -61,6 +64,14 @@ def show_info():
     disable_ftp_service()
     print("2.5. DNS Zone Transfer 설정")
     set_dns_zone_transfer()
+
+    print("3. 패치 및 로그 관리")
+    # print("3.1. 최신 서비스팩 적용")
+    # print("3.2. 최신 Hot Fix 적용")
+    # print("3.3. 백신 프로그램 업데이트")
+    # print("3.4. 로그의 정기적 검토 및 보고")
+    print("3.1. 레지스트리 원격 접근 비활성화")
+    disable_remote_registry_service()
 
     print("------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
