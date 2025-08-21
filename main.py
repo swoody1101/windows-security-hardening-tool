@@ -1,5 +1,5 @@
 from utils import run_as_admin
-from account_management import (
+from managements.account_management import (
     rename_admin_account_wmi,
     disable_guest_account,
     delete_unnecessary_users,
@@ -9,14 +9,14 @@ from account_management import (
     disable_reversible_encryption,
     revoke_unnecessary_admin_privileges,
 )
-from service_management import (
+from managements.service_management import (
     restore_share_permissions,
     disable_default_shares,
     set_netbios_options,
     disable_ftp_service,
     set_dns_zone_transfer,
 )
-from log_management import (
+from managements.log_management import (
     disable_remote_registry_service,
 )
 
