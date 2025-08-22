@@ -208,10 +208,15 @@ def configure_crash_on_audit_fail():
 
 # 익명 SAM 계정 및 공유 열거를 제한하도록 restrictanonymous와 restrictanonymoussam 값을 1로 변경
 def restrict_anonymous_enumeration():
-    key_path = r"SYSTEM\CurrentContorlSet\Control\Lsa"
+    key_path = r"SYSTEM\CurrentControlSet\Control\Lsa"
 
     try:
-        reg_key = winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE, key_path)
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            key_path,
+            0,
+            winreg.KEY_READ | winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
 
         print("restrictanonymous 값을 1로 설정합니다.")
         winreg.SetValueEx(reg_key, "restrictanonymous", 0, winreg.REG_DWORD, 1)
