@@ -2,7 +2,7 @@ import subprocess
 import wmi
 import os
 
-from utils import get_user_list, get_admin_list
+from utils import get_user_list, get_admin_list, cleanup_security_policy_files
 
 
 # Administrator 계정 이름을 JLKAdmin으로 변경
@@ -233,14 +233,7 @@ def disable_reversible_encryption():
         print(f"예기치 않은 오류가 발생했습니다: {e}\n")
 
     finally:
-        if os.path.exists(export_cfg_path):
-            os.remove(export_cfg_path)
-        sdb_path = os.path.join(desktop_path, "cfg.sdb")
-        if os.path.exists(sdb_path):
-            os.remove(sdb_path)
-        jfm_path = os.path.join(desktop_path, "cfg.jfm")
-        if os.path.exists(jfm_path):
-            os.remove(jfm_path)
+        cleanup_security_policy_files(desktop_path, export_cfg_path)
 
 
 # 관리자 그룹에 불필요한 계정 권한 회수

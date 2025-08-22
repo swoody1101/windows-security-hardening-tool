@@ -23,6 +23,7 @@ from managements.security_management import (
     secure_sam_file_permissions,
     configure_shutdown_policy,
     configure_remote_shutdown_privilege,
+    configure_crash_on_audit_fail,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -83,10 +84,12 @@ def show_info():
     print("4. 보안 관리")
     print("4.1. SAM 파일 접근 통제 설정")
     secure_sam_file_permissions()
-    print("4.2. 로그인하지 않고 시스템 종료 비활성화 설정")
+    print("4.2. 로그인하지 않고 시스템 종료 설정 비활성화 ")
     configure_shutdown_policy()
-    print("4.3. 원격 시스템에서 강제 시스템 종료 비활성화 설정")
+    print("4.3. 원격 시스템에서 강제 시스템 종료 설정 비활성화")
     configure_remote_shutdown_privilege()
+    print("4.4. 보안 감사를 로그할 수 없을 경우 종료 설정 비활성화")
+    configure_crash_on_audit_fail()
     print()
 
     print("------------------------------------------------")
