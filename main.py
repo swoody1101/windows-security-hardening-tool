@@ -19,6 +19,9 @@ from managements.service_management import (
 from managements.log_management import (
     disable_remote_registry_service,
 )
+from managements.security_management import (
+    secure_sam_file_permissions,
+)
 
 __project_name__ = "Windows Security Scanner"
 __version__ = "0.0.0"
@@ -64,6 +67,7 @@ def show_info():
     disable_ftp_service()
     print("2.5. DNS Zone Transfer 설정")
     set_dns_zone_transfer()
+    print()
 
     print("3. 패치 및 로그 관리")
     # print("3.1. 최신 서비스팩 적용")
@@ -72,6 +76,12 @@ def show_info():
     # print("3.4. 로그의 정기적 검토 및 보고")
     print("3.1. 레지스트리 원격 접근 비활성화")
     disable_remote_registry_service()
+    print()
+
+    print("4. 보안 관리")
+    print("4.1. SAM 파일 접근 통제 설정")
+    secure_sam_file_permissions()
+    print()
 
     print("------------------------------------------------")
     print("모든 보안 점검 및 수정 작업이 완료되었습니다.")
