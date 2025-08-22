@@ -169,14 +169,18 @@ def configure_crash_on_audit_fail():
         with open(export_cfg_path, "w", encoding="utf-8", errors="ignore") as f:
             for line in lines:
                 if "CrashOnAuditFail" in line:
-                    f.write("CrashOnAuditFail=4,1\n")
+                    f.write(
+                        "MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail = 4,1\n"
+                    )
                     found = True
                 else:
                     f.write(line)
             if not found:
                 if not any("[Registry Values]" in l for l in lines):
                     f.write("\n[Registry Values]\n")
-                f.write("CrashOnAuditFail=4,1\n")
+                f.write(
+                    "MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail = 4,1\n"
+                )
 
         print("수정된 정책 파일을 시스템에 적용합니다.")
         subprocess.run(
