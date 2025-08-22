@@ -24,6 +24,7 @@ from managements.security_management import (
     configure_shutdown_policy,
     configure_remote_shutdown_privilege,
     configure_crash_on_audit_fail,
+    restrict_anonymous_enumeration,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -90,6 +91,8 @@ def show_info():
     configure_remote_shutdown_privilege()
     print("4.4. 보안 감사를 로그할 수 없을 경우 종료 설정 비활성화")
     configure_crash_on_audit_fail()
+    print("4.5. SAM 계정과 공유의 익명 열거 설정 비활성화")
+    restrict_anonymous_enumeration()
     print()
 
     print("------------------------------------------------")

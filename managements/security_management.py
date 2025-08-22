@@ -204,3 +204,39 @@ def configure_crash_on_audit_fail():
 
     finally:
         cleanup_security_policy_files(desktop_path, export_cfg_path)
+
+
+# 익명 SAM 계정 및 공유 열거를 제한하도록 restrictanonymous와 restrictanonymoussam 값을 1로 변경
+def restrict_anonymous_enumeration():
+    key_path = r"SYSTEM\CurrentControlSet\Control\Lsa"
+
+    try:
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            key_path,
+            0,
+            winreg.KEY_READ | winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
+
+        print("restrictanonymous 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "restrictanonymous", 0, winreg.REG_DWORD, 1)
+
+        print("restrictanonymoussam 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "restrictanonymoussam", 0, winreg.REG_DWORD, 1)
+
+        winreg.CloseKey(reg_key)
+        print("익명 열거 설정이 성공적으로 완료되었습니다.")
+
+        subprocess.run(
+            ["gpupdate", "/force"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print("정책 새로 고침이 성공했습니다.\n")
+
+    except FileNotFoundError:
+        print(f"오류: 레지스트리 키 '{key_path}'를 찾을 수 없습니다.")
+    except Exception as e:
+        print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}")
