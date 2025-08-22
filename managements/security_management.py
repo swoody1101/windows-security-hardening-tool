@@ -3,6 +3,8 @@ import os
 import re
 import winreg
 
+from utils import cleanup_security_policy_files
+
 
 # SAM 파일의 접근 권한을 Administrator, System 그룹으로만 제한
 def secure_sam_file_permissions():
@@ -142,11 +144,59 @@ def configure_remote_shutdown_privilege():
         print(f"예기치 않은 오류가 발생했습니다: {e}\n")
 
     finally:
-        if os.path.exists(export_cfg_path):
-            os.remove(export_cfg_path)
-        sdb_path = os.path.join(desktop_path, "cfg.sdb")
-        if os.path.exists(sdb_path):
-            os.remove(sdb_path)
-        jfm_path = os.path.join(desktop_path, "cfg.jfm")
-        if os.path.exists(jfm_path):
-            os.remove(jfm_path)
+        cleanup_security_policy_files(desktop_path, export_cfg_path)
+
+
+# 보안 감사를 로그 할 수 없을 경우 즉시 종료 설정 비활성화
+def configure_crash_on_audit_fail():
+    desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
+    export_cfg_path = os.path.join(desktop_path, "cfg.txt")
+
+    try:
+        print(f"현재 보안 설정을 '{export_cfg_path}' 파일로 내보냅니다.")
+        subprocess.run(
+            ["secedit", "/export", "/cfg", export_cfg_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+
+        print("파일에서 'CrashOnAuditFail' 설정을 '4,1'으로 변경합니다.")
+        with open(export_cfg_path, "r", encoding="utf-16") as f:
+            lines = f.readlines()
+        found = False
+        with open(export_cfg_path, "w", encoding="utf-8", errors="ignore") as f:
+            for line in lines:
+                if "CrashOnAuditFail" in line:
+                    f.write("CrashOnAuditFail=4,1\n")
+                    found = True
+                else:
+                    f.write(line)
+            if not found:
+                if not any("[Registry Values]" in l for l in lines):
+                    f.write("\n[Registry Values]\n")
+                f.write("CrashOnAuditFail=4,1\n")
+
+        print("수정된 정책 파일을 시스템에 적용합니다.")
+        subprocess.run(
+            ["secedit", "/configure", "/db", "cfg.sdb", "/cfg", export_cfg_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print(
+            "보안 감사를 로그 할 수 없을 경우 즉시 종료 설정이 성공적으로 비활성화되었습니다.\n"
+        )
+
+    except subprocess.CalledProcessError as e:
+        print(f"정책 적용 실패: {e.stderr.strip()}")
+        print("오류 원인: 관리자 권한으로 실행되었는지 확인하십시오.\n")
+    except FileNotFoundError as e:
+        print(f"파일이 존재하지 않습니다: {e}\n")
+    except Exception as e:
+        print(f"예기치 않은 오류가 발생했습니다: {e}\n")
+
+    finally:
+        cleanup_security_policy_files(desktop_path, export_cfg_path)
