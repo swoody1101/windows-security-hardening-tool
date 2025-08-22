@@ -199,3 +199,15 @@ def is_windows_server():
     except Exception as e:
         print(f"예상치 못한 오류가 발생했습니다: {e}\n")
         return False
+
+
+# 임시 보안 정책 파일 삭제
+def cleanup_security_policy_files(desktop_path, export_cfg_path):
+    if os.path.exists(export_cfg_path):
+        os.remove(export_cfg_path)
+    sdb_path = os.path.join(desktop_path, "cfg.sdb")
+    if os.path.exists(sdb_path):
+        os.remove(sdb_path)
+    jfm_path = os.path.join(desktop_path, "cfg.jfm")
+    if os.path.exists(jfm_path):
+        os.remove(jfm_path)
