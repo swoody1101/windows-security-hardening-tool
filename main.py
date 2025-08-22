@@ -21,6 +21,7 @@ from managements.log_management import (
 )
 from managements.security_management import (
     secure_sam_file_permissions,
+    configure_shutdown_policy,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -81,6 +82,8 @@ def show_info():
     print("4. 보안 관리")
     print("4.1. SAM 파일 접근 통제 설정")
     secure_sam_file_permissions()
+    print("4.2. 로그인하지 않고 시스템 종료 비활성화 설정")
+    configure_shutdown_policy()
     print()
 
     print("------------------------------------------------")
