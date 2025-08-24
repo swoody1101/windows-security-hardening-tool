@@ -25,6 +25,7 @@ from managements.security_management import (
     configure_remote_shutdown_privilege,
     configure_crash_on_audit_fail,
     restrict_anonymous_enumeration,
+    check_autoadminlogon_status,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -93,6 +94,8 @@ def show_info():
     configure_crash_on_audit_fail()
     print("4.5. SAM 계정과 공유의 익명 열거 설정 비활성화")
     restrict_anonymous_enumeration()
+    print("4.6. Autologon 설정 비활성화")
+    check_autoadminlogon_status()
     print()
 
     print("------------------------------------------------")

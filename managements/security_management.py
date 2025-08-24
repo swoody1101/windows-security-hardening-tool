@@ -240,3 +240,33 @@ def restrict_anonymous_enumeration():
         print(f"오류: 레지스트리 키 '{key_path}'를 찾을 수 없습니다.")
     except Exception as e:
         print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}")
+
+
+# Autologon 존재하지 않거나 0으로 설정되어 있는지 확인
+def check_autoadminlogon_status():
+    key_path = r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon"
+    value_name = "AutoAdminLogon"
+
+    try:
+        reg_key = winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE, key_path)
+
+        try:
+            current_value, _ = winreg.QueryValueEx(reg_key, value_name)
+            print(f"현재 '{value_name}' 값: {current_value}")
+        except FileNotFoundError:
+            current_value = None
+            print(f"현재 'AutoAdminLogon' 값이 존재하지 않아 비활성화 상태입니다.")
+
+        if current_value == 1:
+            print("'AutoAdminLogon' 값을 0으로 변경합니다.")
+            winreg.SetValueEx(reg_key, value_name, 0, winreg.REG_DWORD, 0)
+            print("'AutoAdminLogon'이 0으로 설정되었습니다.\n")
+        elif current_value == 0:
+            print("'AutoAdminLogon'이 이미 0으로 설정되어 있습니다.\n")
+
+    except Exception as e:
+        print(f"정책 설정 중 오류가 발생했습니다: {e}\n")
+
+    finally:
+        if "reg_key" in locals():
+            winreg.CloseKey(reg_key)
