@@ -225,24 +225,15 @@ def restrict_anonymous_enumeration():
         winreg.SetValueEx(reg_key, "restrictanonymoussam", 0, winreg.REG_DWORD, 1)
 
         winreg.CloseKey(reg_key)
-        print("익명 열거 설정이 성공적으로 완료되었습니다.")
-
-        subprocess.run(
-            ["gpupdate", "/force"],
-            check=True,
-            capture_output=True,
-            text=True,
-            encoding="cp949",
-        )
-        print("정책 새로 고침이 성공했습니다.\n")
+        print("익명 열거 설정이 성공적으로 완료되었습니다.\n")
 
     except FileNotFoundError:
-        print(f"오류: 레지스트리 키 '{key_path}'를 찾을 수 없습니다.")
+        print(f"오류: 레지스트리 키 '{key_path}'를 찾을 수 없습니다.\n")
     except Exception as e:
-        print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}")
+        print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")
 
 
-# Autologon 존재하지 않거나 0으로 설정되어 있는지 확인
+# Autologon 레지스트리가 존재할 경우 0으로 설정
 def check_autoadminlogon_status():
     key_path = r"Software\Microsoft\Windows NT\CurrentVersion\Winlogon"
     value_name = "AutoAdminLogon"
@@ -255,7 +246,7 @@ def check_autoadminlogon_status():
             print(f"현재 '{value_name}' 값: {current_value}")
         except FileNotFoundError:
             current_value = None
-            print(f"현재 'AutoAdminLogon' 값이 존재하지 않아 비활성화 상태입니다.")
+            print(f"현재 'AutoAdminLogon' 값이 존재하지 않아 비활성화 상태입니다.\n")
 
         if current_value == 1:
             print("'AutoAdminLogon' 값을 0으로 변경합니다.")
@@ -270,3 +261,65 @@ def check_autoadminlogon_status():
     finally:
         if "reg_key" in locals():
             winreg.CloseKey(reg_key)
+
+
+# 이동식 미디어 포맷 및 꺼내기 보안 정책을 관리자로 설정
+def configure_removable_media_policy():
+    desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
+    export_cfg_path = os.path.join(desktop_path, "cfg.txt")
+
+    try:
+        print("AllocateDASD' 값을 설정하여 로그인 화면 접근을 차단합니다.")
+        key_path_dasd = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+        reg_key_dasd = winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE, key_path_dasd)
+        winreg.SetValueEx(reg_key_dasd, "AllocateDASD", 0, winreg.REG_DWORD, 0)
+        winreg.CloseKey(reg_key_dasd)
+        print("'AllocateDASD' 값이 성공적으로 0으로 설정되었습니다.")
+
+        print("'RemovableMedia' 값을 설정하여 포맷 및 꺼내기 권한을 제한합니다.")
+        key_path_rm = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+        reg_key_rm = winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE, key_path_rm)
+        winreg.SetValueEx(reg_key_rm, "RemovableMedia", 0, winreg.REG_DWORD, 1)
+        winreg.CloseKey(reg_key_rm)
+        print(
+            "이동식 미디어 포맷 및 꺼내기 허용 정책이 'Administrators'로 제한되었습니다."
+        )
+
+        print("모든 이동식 미디어 보안 정책 설정이 완료되었습니다.")
+
+        subprocess.run(
+            ["secedit", "/export", "/cfg", export_cfg_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        with open(export_cfg_path, "r", encoding="utf-16") as f:
+            lines = f.readlines()
+        found = False
+        with open(export_cfg_path, "w", encoding="utf-8", errors="ignore") as f:
+            for line in lines:
+                if "RemovableMedia" in line:
+                    f.write("RemovableMedia = 1\n")
+                    found = True
+                else:
+                    f.write(line)
+            if not found:
+                if not any("[Registry Values]" in l for l in lines):
+                    f.write("\n[System Access]\n")
+                f.write("RemovableMedia = 1\n")
+
+        print("수정된 정책 파일을 시스템에 적용합니다.\n")
+        subprocess.run(
+            ["secedit", "/configure", "/db", "cfg.sdb", "/cfg", export_cfg_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+
+    except Exception as e:
+        print(f"오류: 정책 설정 중 오류가 발생했습니다: {e}\n")
+
+    finally:
+        cleanup_security_policy_files(desktop_path, export_cfg_path)
