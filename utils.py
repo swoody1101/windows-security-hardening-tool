@@ -211,3 +211,21 @@ def cleanup_security_policy_files(desktop_path, export_cfg_path):
     jfm_path = os.path.join(desktop_path, "cfg.jfm")
     if os.path.exists(jfm_path):
         os.remove(jfm_path)
+
+
+# 로컬 보안 정책 변경사항 적용
+def update_local_security_policy():
+    try:
+        subprocess.run(
+            ["gpupdate", "/force"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print("로컬 보안 정책 업데이트가 성공적으로 완료되었습니다.\n")
+    except subprocess.CalledProcessError as e:
+        print(f"오류: 정책 업데이트 실패. {e.stderr.strip()}")
+        print("이 스크립트는 관리자 권한으로 실행해야 합니다.\n")
+    except Exception as e:
+        print(f"오류: 예상치 못한 오류가 발생했습니다: {e}\n")
