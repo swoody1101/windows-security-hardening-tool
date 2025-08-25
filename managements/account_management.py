@@ -6,7 +6,7 @@ from utils import get_user_list, get_admin_list, cleanup_security_policy_files
 
 
 # Administrator 계정 이름을 JLKAdmin으로 변경
-def rename_admin_account_wmi(new_name="JLKAdmin"):
+def rename_admin_account(new_name="JLKAdmin"):
     current_admin_name = "Administrator"
 
     try:

@@ -3,7 +3,7 @@ from utils import (
     update_local_security_policy,
 )
 from managements.account_management import (
-    rename_admin_account_wmi,
+    rename_admin_account,
     disable_guest_account,
     delete_unnecessary_users,
     set_lockout_threshold,
@@ -48,7 +48,7 @@ def show_info():
 
     print("1. 계정 관리")
     print("1.1. Administrator 계정 이름 변경")
-    rename_admin_account_wmi()
+    rename_admin_account()
     print("1.2. Guest 계정 비활성화")
     disable_guest_account()
     print("1.3. 불필요한 사용자 계정 제거")
