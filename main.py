@@ -1,4 +1,7 @@
-from utils import run_as_admin
+from utils import (
+    run_as_admin,
+    update_local_security_policy,
+)
 from managements.account_management import (
     rename_admin_account_wmi,
     disable_guest_account,
@@ -26,6 +29,7 @@ from managements.security_management import (
     configure_crash_on_audit_fail,
     restrict_anonymous_enumeration,
     check_autoadminlogon_status,
+    configure_removable_media_policy,
 )
 
 __project_name__ = "Windows Security Scanner"
@@ -96,6 +100,11 @@ def show_info():
     restrict_anonymous_enumeration()
     print("4.6. Autologon 설정 비활성화")
     check_autoadminlogon_status()
+    print("4.7. 이동식 미디어 포맷 및 꺼내기 관리자 설정")
+    configure_removable_media_policy()
+
+    print("로컬 보안 정책 수정 사항을 반영합니다.")
+    update_local_security_policy()
     print()
 
     print("------------------------------------------------")
