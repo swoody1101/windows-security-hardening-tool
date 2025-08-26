@@ -32,8 +32,8 @@ from managements.security_management import (
     configure_removable_media_policy,
 )
 
-__project_name__ = "Windows Security Scanner"
-__version__ = "0.0.0"
+__project_name__ = "Windows Security Hardening Tool"
+__version__ = "1.0.0"
 __author__ = "LEE SANG U"
 
 
