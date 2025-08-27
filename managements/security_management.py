@@ -206,7 +206,7 @@ def configure_crash_on_audit_fail():
         cleanup_security_policy_files(desktop_path, export_cfg_path)
 
 
-# 익명 SAM 계정 및 공유 열거를 제한하도록 restrictanonymous와 restrictanonymoussam 값을 1로 변경
+# SAM 계정 및 공유 열거를 제한하도록 restrictanonymous와 restrictanonymoussam 레지스트리 값을 1로 변경
 def restrict_anonymous_enumeration():
     key_path = r"SYSTEM\CurrentControlSet\Control\Lsa"
 
