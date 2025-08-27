@@ -154,6 +154,7 @@ def set_netbios_options():
 
 # FTP 서비스 구동 확인 및 시작유형을 "사용 안 함"으로 설정
 def disable_ftp_service():
+    print("")
     print("FTP 서비스를 중지합니다.")
     try:
         subprocess.run(
@@ -165,7 +166,12 @@ def disable_ftp_service():
         )
         print("FTP 서비스가 성공적으로 중지되었습니다.")
     except subprocess.CalledProcessError as e:
-        print(f"FTP 서비스 중지 실패: {e.stderr.strip()}")
+        if "서비스 이름이 잘못되었습니다." in e.stderr.strip():
+            print("FTP 서비스를 미사용 중입니다.\n")
+            return
+        else:
+            print(f"FTP 서비스 중지 실패: {e.stderr.strip()}\n")
+            return
 
     print("FTP 서비스의 시작 유형을 '사용 안 함'으로 설정합니다.")
     try:
