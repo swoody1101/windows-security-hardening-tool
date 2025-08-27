@@ -162,7 +162,7 @@ def configure_crash_on_audit_fail():
             encoding="cp949",
         )
 
-        print("파일에서 'CrashOnAuditFail' 설정을 '4,1'으로 변경합니다.")
+        print("파일에서 'CrashOnAuditFail' 설정을 '4,0'으로 변경합니다.")
         with open(export_cfg_path, "r", encoding="utf-16") as f:
             lines = f.readlines()
         found = False
@@ -170,7 +170,7 @@ def configure_crash_on_audit_fail():
             for line in lines:
                 if "CrashOnAuditFail" in line:
                     f.write(
-                        "MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail = 4,1\n"
+                        "MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail = 4,0\n"
                     )
                     found = True
                 else:
@@ -179,7 +179,7 @@ def configure_crash_on_audit_fail():
                 if not any("[Registry Values]" in l for l in lines):
                     f.write("\n[Registry Values]\n")
                 f.write(
-                    "MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail = 4,1\n"
+                    "MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail = 4,0\n"
                 )
 
         print("수정된 정책 파일을 시스템에 적용합니다.")
