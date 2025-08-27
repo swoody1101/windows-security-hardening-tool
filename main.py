@@ -59,7 +59,7 @@ def show_info():
     set_max_password_age()
     print("1.6. 암호 사용 기간 제한 없음 설정 비활성화")
     disable_password_never_expires()
-    print("1.7. 해독 가능한 암호화 설정 비활성화")
+    print("1.7. 해독 가능한 암호화를 사용하여 암호 정책 설정 비활성화")
     disable_reversible_encryption()
     print("1.8. 불필요한 관리자 계정 관리자 권한 회수")
     revoke_unnecessary_admin_privileges()
