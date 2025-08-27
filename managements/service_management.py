@@ -86,7 +86,7 @@ def disable_default_shares():
             "레지스트리 값(AutoShareServer, AutoShareWks)이 성공적으로 '0'으로 변경되었습니다."
         )
 
-        shares_to_delete = ["C$", "D$"]
+        shares_to_delete = ["C$", "D$", "E$"]
         print("기존의 기본 공유를 삭제합니다.")
         for share in shares_to_delete:
             try:
@@ -104,26 +104,21 @@ def disable_default_shares():
             except subprocess.TimeoutExpired:
                 print(f"'{share}' 삭제 명령어 시간 초과. 다음 공유로 넘어갑니다.")
 
-        print("SMB 관련 서비스를 재시작하여 변경사항을 적용합니다.")
-        stop_command = (
-            "Stop-Service -Name LanmanServer -Force -ErrorAction SilentlyContinue"
-        )
-        start_command = "Start-Service -Name LanmanServer"
+        print("관련 서비스를 재시작하여 변경사항을 적용합니다.")
         subprocess.run(
-            ["powershell.exe", "-Command", stop_command],
+            ["powershell.exe", "-Command", "Stop-Service -Name LanmanServer -Force"],
             check=True,
             capture_output=True,
             text=True,
             encoding="cp949",
         )
         subprocess.run(
-            ["powershell.exe", "-Command", start_command],
+            ["powershell.exe", "-Command", "Start-Service -Name LanmanServer"],
             check=True,
             capture_output=True,
             text=True,
             encoding="cp949",
         )
-
         print("기본 공유가 성공적으로 비활성화되었습니다.")
         print("시스템을 재부팅하면 변경사항이 적용됩니다.\n")
 
