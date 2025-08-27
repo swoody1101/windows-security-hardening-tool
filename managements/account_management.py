@@ -158,12 +158,9 @@ def disable_password_never_expires():
             print(f"'{user} 계정의 암호사용 기간 제한 없음 설정을 비활성화합니다.")
             subprocess.run(
                 [
-                    "wmic",
-                    "useraccount",
-                    "where",
-                    f"name='{user}'",
-                    "set",
-                    "passwordexpires=true",
+                    "powershell",
+                    "-Command",
+                    f"Set-LocalUser -Name '{user}' -PasswordNeverExpires $false",
                 ],
                 check=True,
                 capture_output=True,
