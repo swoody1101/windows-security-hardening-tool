@@ -90,7 +90,7 @@ def configure_shutdown_policy():
             winreg.CloseKey(reg_key)
 
 
-# 원격 시스템에서 강제로 시스템 종료 정책에 "Administrators"만 존재하도록 변경
+# 원격 시스템에서 강제 시스템 종료 정책에 "Administrators"만 존재하도록 변경
 def configure_remote_shutdown_privilege():
     desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
     export_cfg_path = os.path.join(desktop_path, "cfg.txt")
@@ -147,7 +147,7 @@ def configure_remote_shutdown_privilege():
         cleanup_security_policy_files(desktop_path, export_cfg_path)
 
 
-# 보안 감사를 로그 할 수 없을 경우 즉시 종료 설정 비활성화
+# 보안 감사를 로그 할 수 없을 경우 시스템 종료 설정 비활성화
 def configure_crash_on_audit_fail():
     desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
     export_cfg_path = os.path.join(desktop_path, "cfg.txt")
