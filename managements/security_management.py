@@ -59,10 +59,6 @@ def secure_sam_file_permissions():
 
 # 로그인하지 않고 시스템 종료 비활성화 설정
 def configure_shutdown_policy():
-    """
-    '시스템 종료: 로그인하지 않고 시스템 종료 허용' 정책을
-    '사용 안 함'으로 설정(레지스트리 값 0)합니다.
-    """
     key_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
     value_name = "shutdownwithoutlogon"
 
