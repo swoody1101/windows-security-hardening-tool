@@ -144,7 +144,7 @@ def set_netbios_options():
         winreg.SetValueEx(reg_key, "NetbiosOptions", 0, winreg.REG_DWORD, 2)
 
         winreg.CloseKey(reg_key)
-        print(f"'etbiosOptions'를 '2'로 성공적으로 설정했습니다.\n")
+        print(f"'NetbiosOptions'를 '2'로 성공적으로 설정했습니다.\n")
 
     except FileNotFoundError:
         print(f"오류: 레지스트리 경로 '{base_key_path}'를 찾을 수 없습니다.\n")
