@@ -59,10 +59,6 @@ def secure_sam_file_permissions():
 
 # 로그인하지 않고 시스템 종료 비활성화 설정
 def configure_shutdown_policy():
-    """
-    '시스템 종료: 로그인하지 않고 시스템 종료 허용' 정책을
-    '사용 안 함'으로 설정(레지스트리 값 0)합니다.
-    """
     key_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
     value_name = "shutdownwithoutlogon"
 
@@ -90,7 +86,7 @@ def configure_shutdown_policy():
             winreg.CloseKey(reg_key)
 
 
-# 원격 시스템에서 강제로 시스템 종료 정책에 "Administrators"만 존재하도록 변경
+# 원격 시스템에서 강제 시스템 종료 정책에 "Administrators"만 존재하도록 변경
 def configure_remote_shutdown_privilege():
     desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
     export_cfg_path = os.path.join(desktop_path, "cfg.txt")
@@ -147,7 +143,7 @@ def configure_remote_shutdown_privilege():
         cleanup_security_policy_files(desktop_path, export_cfg_path)
 
 
-# 보안 감사를 로그 할 수 없을 경우 즉시 종료 설정 비활성화
+# 보안 감사를 로그 할 수 없을 경우 시스템 종료 설정 비활성화
 def configure_crash_on_audit_fail():
     desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
     export_cfg_path = os.path.join(desktop_path, "cfg.txt")
@@ -162,7 +158,7 @@ def configure_crash_on_audit_fail():
             encoding="cp949",
         )
 
-        print("파일에서 'CrashOnAuditFail' 설정을 '4,1'으로 변경합니다.")
+        print("파일에서 'CrashOnAuditFail' 설정을 '4,0'으로 변경합니다.")
         with open(export_cfg_path, "r", encoding="utf-16") as f:
             lines = f.readlines()
         found = False
@@ -170,7 +166,7 @@ def configure_crash_on_audit_fail():
             for line in lines:
                 if "CrashOnAuditFail" in line:
                     f.write(
-                        "MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail = 4,1\n"
+                        "MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail = 4,0\n"
                     )
                     found = True
                 else:
@@ -179,7 +175,7 @@ def configure_crash_on_audit_fail():
                 if not any("[Registry Values]" in l for l in lines):
                     f.write("\n[Registry Values]\n")
                 f.write(
-                    "MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail = 4,1\n"
+                    "MACHINE\System\CurrentControlSet\Control\Lsa\CrashOnAuditFail = 4,0\n"
                 )
 
         print("수정된 정책 파일을 시스템에 적용합니다.")
@@ -206,7 +202,7 @@ def configure_crash_on_audit_fail():
         cleanup_security_policy_files(desktop_path, export_cfg_path)
 
 
-# 익명 SAM 계정 및 공유 열거를 제한하도록 restrictanonymous와 restrictanonymoussam 값을 1로 변경
+# SAM 계정 및 공유 열거를 제한하도록 restrictanonymous와 restrictanonymoussam 레지스트리 값을 1로 변경
 def restrict_anonymous_enumeration():
     key_path = r"SYSTEM\CurrentControlSet\Control\Lsa"
 

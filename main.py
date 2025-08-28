@@ -3,7 +3,7 @@ from utils import (
     update_local_security_policy,
 )
 from managements.account_management import (
-    rename_admin_account_wmi,
+    rename_admin_account,
     disable_guest_account,
     delete_unnecessary_users,
     set_lockout_threshold,
@@ -32,8 +32,8 @@ from managements.security_management import (
     configure_removable_media_policy,
 )
 
-__project_name__ = "Windows Security Scanner"
-__version__ = "0.0.0"
+__project_name__ = "Windows Security Hardening Tool"
+__version__ = "1.0.0"
 __author__ = "LEE SANG U"
 
 
@@ -48,7 +48,7 @@ def show_info():
 
     print("1. 계정 관리")
     print("1.1. Administrator 계정 이름 변경")
-    rename_admin_account_wmi()
+    rename_admin_account()
     print("1.2. Guest 계정 비활성화")
     disable_guest_account()
     print("1.3. 불필요한 사용자 계정 제거")
@@ -59,7 +59,7 @@ def show_info():
     set_max_password_age()
     print("1.6. 암호 사용 기간 제한 없음 설정 비활성화")
     disable_password_never_expires()
-    print("1.7. 해독 가능한 암호화 설정 비활성화")
+    print("1.7. 해독 가능한 암호화를 사용하여 암호 정책 설정 비활성화")
     disable_reversible_encryption()
     print("1.8. 불필요한 관리자 계정 관리자 권한 회수")
     revoke_unnecessary_admin_privileges()

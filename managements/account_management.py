@@ -6,7 +6,7 @@ from utils import get_user_list, get_admin_list, cleanup_security_policy_files
 
 
 # Administrator 계정 이름을 JLKAdmin으로 변경
-def rename_admin_account_wmi(new_name="JLKAdmin"):
+def rename_admin_account(new_name="JLKAdmin"):
     current_admin_name = "Administrator"
 
     try:
@@ -158,12 +158,9 @@ def disable_password_never_expires():
             print(f"'{user} 계정의 암호사용 기간 제한 없음 설정을 비활성화합니다.")
             subprocess.run(
                 [
-                    "wmic",
-                    "useraccount",
-                    "where",
-                    f"name='{user}'",
-                    "set",
-                    "passwordexpires=true",
+                    "powershell",
+                    "-Command",
+                    f"Set-LocalUser -Name '{user}' -PasswordNeverExpires $false",
                 ],
                 check=True,
                 capture_output=True,
