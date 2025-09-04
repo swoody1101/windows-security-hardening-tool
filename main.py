@@ -11,6 +11,7 @@ from managements.account_management import (
     disable_password_never_expires,
     disable_reversible_encryption,
     revoke_unnecessary_admin_privileges,
+    revoke_anonymous_everyone_access
 )
 from managements.service_management import (
     restore_share_permissions,
@@ -63,6 +64,8 @@ def show_info():
     disable_reversible_encryption()
     print("1.8. 불필요한 관리자 계정 관리자 권한 회수")
     revoke_unnecessary_admin_privileges()
+    print("1.9. 익명 사용자의 Everyone 사용 권한 회수")
+    revoke_anonymous_everyone_access()
     print()
 
     print("2. 서비스 관리")
