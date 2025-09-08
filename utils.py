@@ -229,3 +229,20 @@ def update_local_security_policy():
         print("이 스크립트는 관리자 권한으로 실행해야 합니다.\n")
     except Exception as e:
         print(f"오류: 예상치 못한 오류가 발생했습니다: {e}\n")
+
+
+# 보안 설정 내보내기
+def export_security_settings(export_cfg_path):
+    try:
+        subprocess.run(
+            ["secedit", "/export", "/cfg", export_cfg_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print(f"보안 설정이 '{export_cfg_path}'로 성공적으로 내보내졌습니다.")
+    except subprocess.CalledProcessError as e:
+        print(f"오류: 보안 설정 내보내기 실패. {e.stderr.strip()}\n")
+    except Exception as e:
+        print(f"오류: 예상치 못한 오류가 발생했습니다: {e}\n")

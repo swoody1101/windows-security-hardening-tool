@@ -3,7 +3,7 @@ import os
 import re
 import winreg
 
-from utils import cleanup_security_policy_files
+from utils import cleanup_security_policy_files, export_security_settings
 
 
 # SAM 파일의 접근 권한을 Administrator, System 그룹으로만 제한
@@ -92,14 +92,7 @@ def configure_remote_shutdown_privilege():
     export_cfg_path = os.path.join(desktop_path, "cfg.txt")
 
     try:
-        print(f"현재 보안 설정을 '{export_cfg_path}' 파일로 내보냅니다.")
-        subprocess.run(
-            ["secedit", "/export", "/cfg", export_cfg_path],
-            check=True,
-            capture_output=True,
-            text=True,
-            encoding="cp949",
-        )
+        export_security_settings(export_cfg_path)
 
         print(
             "파일에서 'SeRemoteShutdownPrivilege' 설정을 '*S-1-5-32-544'으로 변경합니다."
@@ -149,14 +142,7 @@ def configure_crash_on_audit_fail():
     export_cfg_path = os.path.join(desktop_path, "cfg.txt")
 
     try:
-        print(f"현재 보안 설정을 '{export_cfg_path}' 파일로 내보냅니다.")
-        subprocess.run(
-            ["secedit", "/export", "/cfg", export_cfg_path],
-            check=True,
-            capture_output=True,
-            text=True,
-            encoding="cp949",
-        )
+        export_security_settings(export_cfg_path)
 
         print("파일에서 'CrashOnAuditFail' 설정을 '4,0'으로 변경합니다.")
         with open(export_cfg_path, "r", encoding="utf-16") as f:
@@ -238,18 +224,20 @@ def check_autoadminlogon_status():
         reg_key = winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE, key_path)
 
         try:
-            current_value, _ = winreg.QueryValueEx(reg_key, value_name)
+            current_value, value_type = winreg.QueryValueEx(reg_key, value_name)
+            if value_type == winreg.REG_SZ:
+                current_value = int(current_value)
             print(f"현재 '{value_name}' 값: {current_value}")
+            if current_value == 0:
+                print("'AutoAdminLogon'이 이미 0으로 설정되어 있습니다.\n")
+                return
         except FileNotFoundError:
             current_value = None
             print(f"현재 'AutoAdminLogon' 값이 존재하지 않아 비활성화 상태입니다.\n")
 
-        if current_value == 1:
-            print("'AutoAdminLogon' 값을 0으로 변경합니다.")
-            winreg.SetValueEx(reg_key, value_name, 0, winreg.REG_DWORD, 0)
-            print("'AutoAdminLogon'이 0으로 설정되었습니다.\n")
-        elif current_value == 0:
-            print("'AutoAdminLogon'이 이미 0으로 설정되어 있습니다.\n")
+        print("'AutoAdminLogon' 값을 0으로 변경합니다.")
+        winreg.SetValueEx(reg_key, value_name, 0, winreg.REG_DWORD, 0)
+        print("'AutoAdminLogon'이 0으로 설정되었습니다.\n")
 
     except Exception as e:
         print(f"정책 설정 중 오류가 발생했습니다: {e}\n")
