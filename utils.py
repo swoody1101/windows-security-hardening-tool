@@ -241,7 +241,7 @@ def export_security_settings(export_cfg_path):
             text=True,
             encoding="cp949",
         )
-        print(f"보안 설정이 '{export_cfg_path}'로 성공적으로 내보내졌습니다.\n")
+        print(f"보안 설정이 '{export_cfg_path}'로 성공적으로 내보내졌습니다.")
     except subprocess.CalledProcessError as e:
         print(f"오류: 보안 설정 내보내기 실패. {e.stderr.strip()}\n")
     except Exception as e:
