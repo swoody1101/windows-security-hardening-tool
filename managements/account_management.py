@@ -1,4 +1,5 @@
 import subprocess
+import winreg
 import wmi
 import os
 
@@ -277,3 +278,28 @@ def revoke_unnecessary_admin_privileges():
             print(f"'{admin}'의 관리자 권한 회수를 취소했습니다.")
 
     print("불필요한 관리자 권한 회수를 완료했습니다.\n")
+
+
+# 익명 사용자의 Everyone 사용 권한 회수
+def revoke_anonymous_everyone_access():
+    print("익명 사용자의 Everyone 그룹 사용 권한을 회수합니다.")
+
+    base_key_path = r"SYSTEM\CurrentControlSet\Control\Lsa"
+    try:
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            base_key_path,
+            0,
+            winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
+
+        print("레지스트리 EveryoneIncludesAnonymous 값을 0으로 설정합니다.")
+        winreg.SetValueEx(reg_key, "EveryoneIncludesAnonymous", 0, winreg.REG_DWORD, 0)
+
+        winreg.CloseKey(reg_key)
+        print("익명 사용자의 Everyone 사용 권한이 성공적으로 회수되었습니다.\n")
+
+    except subprocess.CalledProcessError as e:
+        print(f"익명 사용자의 Everyone 사용 권한 회수 오류: {e.stderr.strip()}\n")
+    except Exception as e:
+        print(f"예상치 못한 오류 발생: {e}\n")
