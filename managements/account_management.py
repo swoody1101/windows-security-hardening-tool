@@ -3,7 +3,12 @@ import winreg
 import wmi
 import os
 
-from utils import get_user_list, get_admin_list, cleanup_security_policy_files
+from utils import (
+    get_user_list,
+    get_admin_list,
+    cleanup_security_policy_files,
+    export_security_settings,
+)
 
 
 # Administrator 계정 이름을 JLKAdmin으로 변경
@@ -303,3 +308,51 @@ def revoke_anonymous_everyone_access():
         print(f"익명 사용자의 Everyone 사용 권한 회수 오류: {e.stderr.strip()}\n")
     except Exception as e:
         print(f"예상치 못한 오류 발생: {e}\n")
+
+
+# 패스워드 복잡성 설정 활성화
+def enable_password_complexity():
+    print("패스워드 복잡성 설정을 활성화합니다.")
+
+    desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
+    export_cfg_path = os.path.join(desktop_path, "cfg.txt")
+
+    try:
+        export_security_settings(export_cfg_path)
+
+        print("파일에서 'PasswordComplexity' 설정을 '1'로 변경합니다.")
+        with open(export_cfg_path, "r", encoding="utf-16") as f:
+            lines = f.readlines()
+        found = False
+        with open(export_cfg_path, "w", encoding="utf-8", errors="ignore") as f:
+            for line in lines:
+                if "PasswordComplexity" in line:
+                    f.write("PasswordComplexity = 1\n")
+                    found = True
+                else:
+                    f.write(line)
+            if not found:
+                if not any("[System Access]" in l for l in lines):
+                    f.write("\n[System Access]\n")
+                f.write("PasswordComplexity = 1\n")
+
+        print("수정된 정책 파일을 시스템에 적용합니다.")
+        subprocess.run(
+            ["secedit", "/configure", "/db", "cfg.sdb", "/cfg", export_cfg_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print("패스워드 복잡성 설정이 성공적으로 활성화되었습니다.\n")
+
+    except subprocess.CalledProcessError as e:
+        print(f"정책 적용 실패: {e.stderr.strip()}")
+        print("오류 원인: 관리자 권한으로 실행되었는지 확인하십시오.\n")
+    except FileNotFoundError as e:
+        print(f"파일이 존재하지 않습니다: {e}\n")
+    except Exception as e:
+        print(f"예기치 않은 오류가 발생했습니다: {e}\n")
+
+    finally:
+        cleanup_security_policy_files(desktop_path, export_cfg_path)
