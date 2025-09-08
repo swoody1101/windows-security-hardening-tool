@@ -3,7 +3,7 @@ import os
 import re
 import winreg
 
-from utils import cleanup_security_policy_files
+from utils import cleanup_security_policy_files, export_security_settings
 
 
 # SAM 파일의 접근 권한을 Administrator, System 그룹으로만 제한
@@ -92,14 +92,7 @@ def configure_remote_shutdown_privilege():
     export_cfg_path = os.path.join(desktop_path, "cfg.txt")
 
     try:
-        print(f"현재 보안 설정을 '{export_cfg_path}' 파일로 내보냅니다.")
-        subprocess.run(
-            ["secedit", "/export", "/cfg", export_cfg_path],
-            check=True,
-            capture_output=True,
-            text=True,
-            encoding="cp949",
-        )
+        export_security_settings(export_cfg_path)
 
         print(
             "파일에서 'SeRemoteShutdownPrivilege' 설정을 '*S-1-5-32-544'으로 변경합니다."
@@ -149,14 +142,7 @@ def configure_crash_on_audit_fail():
     export_cfg_path = os.path.join(desktop_path, "cfg.txt")
 
     try:
-        print(f"현재 보안 설정을 '{export_cfg_path}' 파일로 내보냅니다.")
-        subprocess.run(
-            ["secedit", "/export", "/cfg", export_cfg_path],
-            check=True,
-            capture_output=True,
-            text=True,
-            encoding="cp949",
-        )
+        export_security_settings(export_cfg_path)
 
         print("파일에서 'CrashOnAuditFail' 설정을 '4,0'으로 변경합니다.")
         with open(export_cfg_path, "r", encoding="utf-16") as f:
