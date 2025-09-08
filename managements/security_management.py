@@ -226,16 +226,16 @@ def check_autoadminlogon_status():
         try:
             current_value, _ = winreg.QueryValueEx(reg_key, value_name)
             print(f"현재 '{value_name}' 값: {current_value}")
+            if current_value == 0:
+                print("'AutoAdminLogon'이 이미 0으로 설정되어 있습니다.\n")
+                return
         except FileNotFoundError:
             current_value = None
             print(f"현재 'AutoAdminLogon' 값이 존재하지 않아 비활성화 상태입니다.\n")
 
-        if current_value == 1:
-            print("'AutoAdminLogon' 값을 0으로 변경합니다.")
-            winreg.SetValueEx(reg_key, value_name, 0, winreg.REG_DWORD, 0)
-            print("'AutoAdminLogon'이 0으로 설정되었습니다.\n")
-        elif current_value == 0:
-            print("'AutoAdminLogon'이 이미 0으로 설정되어 있습니다.\n")
+        print("'AutoAdminLogon' 값을 0으로 변경합니다.")
+        winreg.SetValueEx(reg_key, value_name, 0, winreg.REG_DWORD, 0)
+        print("'AutoAdminLogon'이 0으로 설정되었습니다.\n")
 
     except Exception as e:
         print(f"정책 설정 중 오류가 발생했습니다: {e}\n")
