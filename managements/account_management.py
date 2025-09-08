@@ -94,6 +94,77 @@ def delete_unnecessary_users():
     print("불필요한 계정 삭제를 완료했습니다.\n")
 
 
+# 관리자 그룹에 불필요한 계정 권한 회수
+def revoke_unnecessary_admin_privileges():
+    admin_list = get_admin_list()
+
+    # 내장 계정 및 변경된 관리자 계정 제외
+    safe_admin_accounts = [
+        "Administrator",
+        "JLKAdmin",
+        "jlk",
+    ]
+    unnecessary_admin_users = [
+        user for user in admin_list if user not in safe_admin_accounts
+    ]
+
+    if not unnecessary_admin_users:
+        print("삭제할 불필요한 관리자 계정이 없습니다.\n")
+        return
+
+    print("불필요한 관리자 계정 목록:")
+    print(unnecessary_admin_users)
+    for admin in unnecessary_admin_users:
+        confirm = input(
+            f"'{admin}'계정의 관리자 권한을 삭제하시겠습니까? (y/n): "
+        ).lower()
+        if confirm == "y":
+            try:
+                subprocess.run(
+                    ["net", "localgroup", "administrators", admin, "/del"],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                    encoding="cp949",
+                )
+                print(f"'{admin}'계정의 관리자 권한이 성공적으로 회수되었습니다.")
+            except subprocess.CalledProcessError as e:
+                print(
+                    f"'{admin}' 관리자 권한 회수 오류: {e.stderr.decode('cp949', errors='ignore')}"
+                )
+            except Exception as e:
+                print(f"오류 발생: {e}")
+        else:
+            print(f"'{admin}'의 관리자 권한 회수를 취소했습니다.")
+
+    print("불필요한 관리자 권한 회수를 완료했습니다.\n")
+
+
+# 익명 사용자의 Everyone 사용 권한 회수
+def revoke_anonymous_everyone_access():
+    print("익명 사용자의 Everyone 그룹 사용 권한을 회수합니다.")
+
+    base_key_path = r"SYSTEM\CurrentControlSet\Control\Lsa"
+    try:
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            base_key_path,
+            0,
+            winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
+
+        print("레지스트리 EveryoneIncludesAnonymous 값을 0으로 설정합니다.")
+        winreg.SetValueEx(reg_key, "EveryoneIncludesAnonymous", 0, winreg.REG_DWORD, 0)
+
+        winreg.CloseKey(reg_key)
+        print("익명 사용자의 Everyone 사용 권한이 성공적으로 회수되었습니다.\n")
+
+    except subprocess.CalledProcessError as e:
+        print(f"익명 사용자의 Everyone 사용 권한 회수 오류: {e.stderr.strip()}\n")
+    except Exception as e:
+        print(f"예상치 못한 오류 발생: {e}\n")
+
+
 # 계정 잠금 임계값 설정
 def set_lockout_threshold():
     print("계정 잠금 임계값을 5로 설정합니다.")
@@ -117,27 +188,52 @@ def set_lockout_threshold():
         print(f"예기치 않은 오류가 발생했습니다: {e}\n")
 
 
-# 패스워드 최대 사용 기간 설정
-def set_max_password_age():
-    print("패스워드 최대 사용 기간 설정을 시작합니다.")
+# 패스워드 복잡성 설정 활성화
+def enable_password_complexity():
+    print("패스워드 복잡성 설정을 활성화합니다.")
+
+    desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
+    export_cfg_path = os.path.join(desktop_path, "cfg.txt")
+
     try:
+        export_security_settings(export_cfg_path)
+
+        print("파일에서 'PasswordComplexity' 설정을 '1'로 변경합니다.")
+        with open(export_cfg_path, "r", encoding="utf-16") as f:
+            lines = f.readlines()
+        found = False
+        with open(export_cfg_path, "w", encoding="utf-8", errors="ignore") as f:
+            for line in lines:
+                if "PasswordComplexity" in line:
+                    f.write("PasswordComplexity = 1\n")
+                    found = True
+                else:
+                    f.write(line)
+            if not found:
+                if not any("[System Access]" in l for l in lines):
+                    f.write("\n[System Access]\n")
+                f.write("PasswordComplexity = 1\n")
+
+        print("수정된 정책 파일을 시스템에 적용합니다.")
         subprocess.run(
-            ["net", "accounts", "/MAXPWAGE:90"],
+            ["secedit", "/configure", "/db", "cfg.sdb", "/cfg", export_cfg_path],
             check=True,
             capture_output=True,
             text=True,
             encoding="cp949",
         )
-        print("패스워드 최대 사용 기간이 '90일'로 성공적으로 설정되었습니다.\n")
+        print("패스워드 복잡성 설정이 성공적으로 활성화되었습니다.\n")
+
     except subprocess.CalledProcessError as e:
-        print(f"패스워드 최대 사용 기간 설정 오류: {e.stderr.strip()}\n")
-        print(
-            "오류 원인: 관리자 권한으로 실행되지 않았거나, 명령에 문제가 있을 수 있습니다.\n"
-        )
-    except FileNotFoundError:
-        print("'net' 명령어를 찾을 수 없습니다. 시스템 PATH를 확인해 주세요.\n")
+        print(f"정책 적용 실패: {e.stderr.strip()}")
+        print("오류 원인: 관리자 권한으로 실행되었는지 확인하십시오.\n")
+    except FileNotFoundError as e:
+        print(f"파일이 존재하지 않습니다: {e}\n")
     except Exception as e:
         print(f"예기치 않은 오류가 발생했습니다: {e}\n")
+
+    finally:
+        cleanup_security_policy_files(desktop_path, export_cfg_path)
 
 
 # 암호 사용 기간 제한 없음 비활성화 설정
@@ -239,120 +335,47 @@ def disable_reversible_encryption():
         cleanup_security_policy_files(desktop_path, export_cfg_path)
 
 
-# 관리자 그룹에 불필요한 계정 권한 회수
-def revoke_unnecessary_admin_privileges():
-    admin_list = get_admin_list()
-
-    # 내장 계정 및 변경된 관리자 계정 제외
-    safe_admin_accounts = [
-        "Administrator",
-        "JLKAdmin",
-        "jlk",
-    ]
-    unnecessary_admin_users = [
-        user for user in admin_list if user not in safe_admin_accounts
-    ]
-
-    if not unnecessary_admin_users:
-        print("삭제할 불필요한 관리자 계정이 없습니다.\n")
-        return
-
-    print("불필요한 관리자 계정 목록:")
-    print(unnecessary_admin_users)
-    for admin in unnecessary_admin_users:
-        confirm = input(
-            f"'{admin}'계정의 관리자 권한을 삭제하시겠습니까? (y/n): "
-        ).lower()
-        if confirm == "y":
-            try:
-                subprocess.run(
-                    ["net", "localgroup", "administrators", admin, "/del"],
-                    check=True,
-                    capture_output=True,
-                    text=True,
-                    encoding="cp949",
-                )
-                print(f"'{admin}'계정의 관리자 권한이 성공적으로 회수되었습니다.")
-            except subprocess.CalledProcessError as e:
-                print(
-                    f"'{admin}' 관리자 권한 회수 오류: {e.stderr.decode('cp949', errors='ignore')}"
-                )
-            except Exception as e:
-                print(f"오류 발생: {e}")
-        else:
-            print(f"'{admin}'의 관리자 권한 회수를 취소했습니다.")
-
-    print("불필요한 관리자 권한 회수를 완료했습니다.\n")
-
-
-# 익명 사용자의 Everyone 사용 권한 회수
-def revoke_anonymous_everyone_access():
-    print("익명 사용자의 Everyone 그룹 사용 권한을 회수합니다.")
-
-    base_key_path = r"SYSTEM\CurrentControlSet\Control\Lsa"
+# 패스워드 최소 암호 길이 설정
+def set_min_password_length(length=8):
+    print(f"패스워드 최소 암호 길이를 {length}로 설정합니다.")
     try:
-        reg_key = winreg.OpenKey(
-            winreg.HKEY_LOCAL_MACHINE,
-            base_key_path,
-            0,
-            winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
-        )
-
-        print("레지스트리 EveryoneIncludesAnonymous 값을 0으로 설정합니다.")
-        winreg.SetValueEx(reg_key, "EveryoneIncludesAnonymous", 0, winreg.REG_DWORD, 0)
-
-        winreg.CloseKey(reg_key)
-        print("익명 사용자의 Everyone 사용 권한이 성공적으로 회수되었습니다.\n")
-
-    except subprocess.CalledProcessError as e:
-        print(f"익명 사용자의 Everyone 사용 권한 회수 오류: {e.stderr.strip()}\n")
-    except Exception as e:
-        print(f"예상치 못한 오류 발생: {e}\n")
-
-
-# 패스워드 복잡성 설정 활성화
-def enable_password_complexity():
-    print("패스워드 복잡성 설정을 활성화합니다.")
-
-    desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
-    export_cfg_path = os.path.join(desktop_path, "cfg.txt")
-
-    try:
-        export_security_settings(export_cfg_path)
-
-        print("파일에서 'PasswordComplexity' 설정을 '1'로 변경합니다.")
-        with open(export_cfg_path, "r", encoding="utf-16") as f:
-            lines = f.readlines()
-        found = False
-        with open(export_cfg_path, "w", encoding="utf-8", errors="ignore") as f:
-            for line in lines:
-                if "PasswordComplexity" in line:
-                    f.write("PasswordComplexity = 1\n")
-                    found = True
-                else:
-                    f.write(line)
-            if not found:
-                if not any("[System Access]" in l for l in lines):
-                    f.write("\n[System Access]\n")
-                f.write("PasswordComplexity = 1\n")
-
-        print("수정된 정책 파일을 시스템에 적용합니다.")
         subprocess.run(
-            ["secedit", "/configure", "/db", "cfg.sdb", "/cfg", export_cfg_path],
+            ["net", "accounts", f"/minpwlen:{length}"],
             check=True,
             capture_output=True,
             text=True,
             encoding="cp949",
         )
-        print("패스워드 복잡성 설정이 성공적으로 활성화되었습니다.\n")
-
+        print(f"패스워드 최소 암호 길이가 '{length}'로 성공적으로 설정되었습니다.\n")
     except subprocess.CalledProcessError as e:
-        print(f"정책 적용 실패: {e.stderr.strip()}")
-        print("오류 원인: 관리자 권한으로 실행되었는지 확인하십시오.\n")
-    except FileNotFoundError as e:
-        print(f"파일이 존재하지 않습니다: {e}\n")
+        print(f"패스워드 최소 암호 길이 설정 오류: {e.stderr.strip()}\n")
+        print(
+            "오류 원인: 관리자 권한으로 실행되지 않았거나, 명령에 문제가 있을 수 있습니다.\n"
+        )
+    except FileNotFoundError:
+        print("'net' 명령어를 찾을 수 없습니다. 시스템 PATH를 확인해 주세요.\n")
+    except Exception as e:
+        print(f"예상치 못한 오류가 발생했습니다: {e}\n")
+
+
+# 패스워드 최대 사용 기간 설정
+def set_max_password_age():
+    print("패스워드 최대 사용 기간 설정을 시작합니다.")
+    try:
+        subprocess.run(
+            ["net", "accounts", "/MAXPWAGE:90"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print("패스워드 최대 사용 기간이 '90일'로 성공적으로 설정되었습니다.\n")
+    except subprocess.CalledProcessError as e:
+        print(f"패스워드 최대 사용 기간 설정 오류: {e.stderr.strip()}\n")
+        print(
+            "오류 원인: 관리자 권한으로 실행되지 않았거나, 명령에 문제가 있을 수 있습니다.\n"
+        )
+    except FileNotFoundError:
+        print("'net' 명령어를 찾을 수 없습니다. 시스템 PATH를 확인해 주세요.\n")
     except Exception as e:
         print(f"예기치 않은 오류가 발생했습니다: {e}\n")
-
-    finally:
-        cleanup_security_policy_files(desktop_path, export_cfg_path)

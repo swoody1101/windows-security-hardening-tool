@@ -13,6 +13,7 @@ from managements.account_management import (
     revoke_unnecessary_admin_privileges,
     revoke_anonymous_everyone_access,
     enable_password_complexity,
+    set_min_password_length,
 )
 from managements.service_management import (
     restore_share_permissions,
@@ -55,20 +56,22 @@ def show_info():
     disable_guest_account()
     print("1.3. 불필요한 사용자 계정 제거")
     delete_unnecessary_users()
-    print("1.4. 계정 잠금 임계값 설정 (설정값: 5)")
-    set_lockout_threshold()
-    print("1.5. 패스워드 최대 사용 기간 설정 (설정값: 90)")
-    set_max_password_age()
-    print("1.6. 암호 사용 기간 제한 없음 설정 비활성화")
-    disable_password_never_expires()
-    print("1.7. 해독 가능한 암호화를 사용하여 암호 정책 설정 비활성화")
-    disable_reversible_encryption()
-    print("1.8. 불필요한 관리자 계정 관리자 권한 회수")
+    print("1.4. 불필요한 관리자 계정 관리자 권한 회수")
     revoke_unnecessary_admin_privileges()
-    print("1.9. 익명 사용자의 Everyone 사용 권한 회수")
+    print("1.5. 익명 사용자의 Everyone 사용 권한 회수")
     revoke_anonymous_everyone_access()
-    print("1.10. 패스워드 복잡성 설정 활성화")
+    print("1.6. 계정 잠금 임계값 설정 (설정값: 5)")
+    set_lockout_threshold()
+    print("1.7. 패스워드 복잡성 설정 활성화")
     enable_password_complexity()
+    print("1.8. 암호 사용 기간 제한 없음 설정 비활성화")
+    disable_password_never_expires()
+    print("1.9. 해독 가능한 암호화를 사용하여 암호 정책 설정 비활성화")
+    disable_reversible_encryption()
+    print("1.10. 패스워드 최소 암호 길이 설정 (설정값: 8)")
+    set_min_password_length(8)
+    print("1.11. 패스워드 최대 사용 기간 설정 (설정값: 90)")
+    set_max_password_age()
     print()
 
     print("2. 서비스 관리")
