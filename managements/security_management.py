@@ -224,7 +224,9 @@ def check_autoadminlogon_status():
         reg_key = winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE, key_path)
 
         try:
-            current_value, _ = winreg.QueryValueEx(reg_key, value_name)
+            current_value, value_type = winreg.QueryValueEx(reg_key, value_name)
+            if value_type == winreg.REG_SZ:
+                current_value = int(current_value)
             print(f"현재 '{value_name}' 값: {current_value}")
             if current_value == 0:
                 print("'AutoAdminLogon'이 이미 0으로 설정되어 있습니다.\n")
