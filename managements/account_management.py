@@ -277,8 +277,6 @@ def disable_password_never_expires():
         except Exception as e:
             print(f"'{user}' 계정 처리 중 예기치 않은 오류 발생: {e}\n")
 
-    print()
-
 
 # 해독 가능한 암호화 설정 비활성화 설정
 def disable_reversible_encryption():
@@ -372,6 +370,30 @@ def set_max_password_age():
         print("패스워드 최대 사용 기간이 '90일'로 성공적으로 설정되었습니다.\n")
     except subprocess.CalledProcessError as e:
         print(f"패스워드 최대 사용 기간 설정 오류: {e.stderr.strip()}\n")
+        print(
+            "오류 원인: 관리자 권한으로 실행되지 않았거나, 명령에 문제가 있을 수 있습니다.\n"
+        )
+    except FileNotFoundError:
+        print("'net' 명령어를 찾을 수 없습니다. 시스템 PATH를 확인해 주세요.\n")
+    except Exception as e:
+        print(f"예기치 않은 오류가 발생했습니다: {e}\n")
+
+
+# 패스워드 최소 사용 기간 설정
+def set_min_password_age():
+    print("패스워드 최소 사용 기간 설정을 시작합니다.")
+    try:
+        result = subprocess.run(
+            ["net", "accounts", "/MINPWAGE:1"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print("패스워드 최소 사용 기간이 '1일'로 성공적으로 설정되었습니다.\n")
+
+    except subprocess.CalledProcessError as e:
+        print(f"패스워드 최소 사용 기간 설정 오류: {e.stderr.strip()}\n")
         print(
             "오류 원인: 관리자 권한으로 실행되지 않았거나, 명령에 문제가 있을 수 있습니다.\n"
         )
