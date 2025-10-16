@@ -14,6 +14,7 @@ from managements.account_management import (
     revoke_anonymous_everyone_access,
     enable_password_complexity,
     set_min_password_length,
+    set_min_password_age,
 )
 from managements.service_management import (
     restore_share_permissions,
@@ -72,6 +73,8 @@ def show_info():
     set_min_password_length(8)
     print("1.11. 패스워드 최대 사용 기간 설정 (설정값: 90)")
     set_max_password_age()
+    print("1.12. 패스워드 최소 사용 기간 설정(설정값: 1)")
+    set_min_password_age()
     print()
 
     print("2. 서비스 관리")
