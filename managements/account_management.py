@@ -401,3 +401,25 @@ def set_min_password_age():
         print("'net' 명령어를 찾을 수 없습니다. 시스템 PATH를 확인해 주세요.\n")
     except Exception as e:
         print(f"예기치 않은 오류가 발생했습니다: {e}\n")
+
+def hide_last_username():
+    print("마지막으로 로그온한 사용자 이름 표시 안 함 설정을 활성화합니다.")
+
+    base_key_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+    try:
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            base_key_path,
+            0,
+            winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
+
+        print("레지스트리 DontDisplayLastUserName 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "DontDisplayLastUserName", 0, winreg.REG_DWORD, 1)
+        winreg.CloseKey(reg_key)
+        print("마지막으로 로그온한 사용자 이름 표시 안 함 설정이 성공적으로 활성화되었습니다.\n")
+
+    except subprocess.CalledProcessError as e:
+        print(f"마지막으로 로그온한 사용자 이름 표시 안 함 설정 오류: {e.stderr.strip()}\n")
+    except Exception as e:
+        print(f"예상치 못한 오류 발생: {e}\n")
