@@ -402,6 +402,8 @@ def set_min_password_age():
     except Exception as e:
         print(f"예기치 않은 오류가 발생했습니다: {e}\n")
 
+
+# 마지막으로 로그온한 사용자 이름 표시 안 함 설정 활성화
 def hide_last_username():
     print("마지막으로 로그온한 사용자 이름 표시 안 함 설정을 활성화합니다.")
 
@@ -417,9 +419,56 @@ def hide_last_username():
         print("레지스트리 DontDisplayLastUserName 값을 1로 설정합니다.")
         winreg.SetValueEx(reg_key, "DontDisplayLastUserName", 0, winreg.REG_DWORD, 1)
         winreg.CloseKey(reg_key)
-        print("마지막으로 로그온한 사용자 이름 표시 안 함 설정이 성공적으로 활성화되었습니다.\n")
+        print(
+            "마지막으로 로그온한 사용자 이름 표시 안 함 설정이 성공적으로 활성화되었습니다.\n"
+        )
 
     except subprocess.CalledProcessError as e:
-        print(f"마지막으로 로그온한 사용자 이름 표시 안 함 설정 오류: {e.stderr.strip()}\n")
+        print(
+            f"마지막으로 로그온한 사용자 이름 표시 안 함 설정 오류: {e.stderr.strip()}\n"
+        )
     except Exception as e:
         print(f"예상치 못한 오류 발생: {e}\n")
+
+
+# 로컬 로그온 허용 정책에 Administrators, IUSR 외 다른 계정 및 그룹 제거
+def restrict_local_logon_access():
+    print("로컬 로그온 허용 정책을 통한 불필요한 계정 접근 제한을 시작합니다.")
+
+    desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
+    export_cfg_path = os.path.join(desktop_path, "cfg.txt")
+
+    try:
+        print(f"현재 보안 설정을 '{export_cfg_path}' 파일로 내보냅니다.")
+        export_security_settings(export_cfg_path)
+
+        print("파일에서 'SeInteractiveLogonRight' 설정을 수정합니다.")
+        with open(export_cfg_path, "r", encoding="utf-16") as f:
+            lines = f.readlines()
+        with open(export_cfg_path, "w", encoding="utf-8", errors="ignore") as f:
+            for line in lines:
+                if "SeInteractiveLogonRight" in line:
+                    f.write("SeInteractiveLogonRight = *S-1-5-32-544\n")
+                else:
+                    f.write(line)
+
+        print("수정된 정책 파일을 시스템에 적용합니다.")
+        subprocess.run(
+            ["secedit", "/configure", "/db", "cfg.sdb", "/cfg", export_cfg_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print("로컬 로그온 허용 정책이 성공적으로 수정되었습니다.\n")
+
+    except subprocess.CalledProcessError as e:
+        print(f"정책 적용 실패: {e.stderr.strip()}")
+        print("오류 원인: 관리자 권한으로 실행되었는지 확인하십시오.\n")
+    except FileNotFoundError as e:
+        print(f"파일이 존재하지 않습니다: {e}\n")
+    except Exception as e:
+        print(f"예기치 않은 오류가 발생했습니다: {e}\n")
+
+    finally:
+        cleanup_security_policy_files(desktop_path, export_cfg_path)
