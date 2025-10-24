@@ -472,3 +472,26 @@ def restrict_local_logon_access():
 
     finally:
         cleanup_security_policy_files(desktop_path, export_cfg_path)
+
+
+# 최근 암호 기억 설정 (설정값: 5)
+def set_password_history_size(size=5):
+    print(f"최근 암호 기억 설정을 {size}로 설정합니다.")
+    try:
+        subprocess.run(
+            ["net", "accounts", f"/uniquepw:{size}"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print(f"최근 암호 기억 설정이 '{size}'로 성공적으로 설정되었습니다.\n")
+    except subprocess.CalledProcessError as e:
+        print(f"최근 암호 기억 설정 오류: {e.stderr.strip()}\n")
+        print(
+            "오류 원인: 관리자 권한으로 실행되지 않았거나, 명령에 문제가 있을 수 있습니다.\n"
+        )
+    except FileNotFoundError:
+        print("'net' 명령어를 찾을 수 없습니다. 시스템 PATH를 확인해 주세요.\n")
+    except Exception as e:
+        print(f"예상치 못한 오류가 발생했습니다: {e}\n")

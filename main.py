@@ -16,7 +16,8 @@ from managements.account_management import (
     set_min_password_length,
     set_min_password_age,
     hide_last_username,
-    restrict_local_logon_access
+    restrict_local_logon_access,
+    set_password_history_size
 )
 from managements.service_management import (
     restore_share_permissions,
@@ -81,6 +82,8 @@ def show_info():
     hide_last_username()
     print("1.14. 불필요한 계정의 로컬 로그온 접근 제한 설정")
     restrict_local_logon_access()
+    print("1.16. 최근 암호 기억 설정 (설정값: 5)")
+    set_password_history_size()
     print()
 
     print("2. 서비스 관리")
