@@ -17,7 +17,8 @@ from managements.account_management import (
     set_min_password_age,
     hide_last_username,
     restrict_local_logon_access,
-    set_password_history_size
+    set_password_history_size,
+    restrict_blank_password_logon
 )
 from managements.service_management import (
     restore_share_permissions,
@@ -84,6 +85,8 @@ def show_info():
     restrict_local_logon_access()
     print("1.16. 최근 암호 기억 설정 (설정값: 5)")
     set_password_history_size()
+    print("1.17. 콘솔 로그온 시 로컬 계정에서 빈 암호 사용 제한 설정")
+    restrict_blank_password_logon()
     print()
 
     print("2. 서비스 관리")
