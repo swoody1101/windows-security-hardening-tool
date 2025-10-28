@@ -18,6 +18,7 @@ from managements.account_management import (
     set_min_password_age,
     hide_last_username,
     restrict_local_logon_access,
+    revoke_anonymous_sid_name_translation,
     set_password_history_size,
     restrict_blank_password_logon,
 )
@@ -70,29 +71,32 @@ def show_info():
     revoke_unnecessary_admin_privileges()
     print("1.7. 익명 사용자의 Everyone 사용 권한 회수")
     revoke_anonymous_everyone_access()
-    print("1.8. 암호 사용 기간 제한 없음 설정 비활성화")
-    disable_password_never_expires()
-    print("1.9. 계정 잠금 기간 (설정값: 60분)")
+    print("1.8. 계정 잠금 기간 (설정값: 60분)")
     set_lockout_duration()
-
     print("1.9. 패스워드 복잡성 설정 활성화")
     enable_password_complexity()
-
     print("1.10. 패스워드 최소 암호 길이 설정 (설정값: 8)")
-    set_min_password_length(8)
+    set_min_password_length()
     print("1.11. 패스워드 최대 사용 기간 설정 (설정값: 90)")
     set_max_password_age()
-    print("1.12. 패스워드 최소 사용 기간 설정(설정값: 1)")
+    print("1.12. 패스워드 최소 사용 기간 설정 (설정값: 1)")
     set_min_password_age()
     print("1.13. 마지막으로 로그온한 사용자 이름 표시 안 함 설정 활성화")
     hide_last_username()
     print("1.14. 불필요한 계정의 로컬 로그온 접근 제한 설정")
     restrict_local_logon_access()
+    print("1.15. 익명 SID/이름 변환 허용 해제 설정")
+    revoke_anonymous_sid_name_translation()
+
     print("1.16. 최근 암호 기억 설정 (설정값: 5)")
     set_password_history_size()
     print("1.17. 콘솔 로그온 시 로컬 계정에서 빈 암호 사용 제한 설정")
     restrict_blank_password_logon()
     print("1.18. 원격터미널 접속 가능한 사용자 그룹 제한 설정")
+
+    print("1.19. 암호 사용 기간 제한 없음 설정 비활성화")
+    disable_password_never_expires()
+
     print()
 
     print("2. 서비스 관리")
