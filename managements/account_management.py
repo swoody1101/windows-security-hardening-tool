@@ -389,11 +389,11 @@ def set_min_password_length(length=8):
 
 
 # 패스워드 최대 사용 기간 설정
-def set_max_password_age():
+def set_max_password_age(length=90):
     print("패스워드 최대 사용 기간 설정을 시작합니다.")
     try:
         subprocess.run(
-            ["net", "accounts", "/MAXPWAGE:90"],
+            ["net", "accounts", f"/MAXPWAGE:{length}"],
             check=True,
             capture_output=True,
             text=True,
@@ -412,11 +412,11 @@ def set_max_password_age():
 
 
 # 패스워드 최소 사용 기간 설정
-def set_min_password_age():
+def set_min_password_age(length=1):
     print("패스워드 최소 사용 기간 설정을 시작합니다.")
     try:
         result = subprocess.run(
-            ["net", "accounts", "/MINPWAGE:1"],
+            ["net", "accounts", f"/MINPWAGE:{length}"],
             check=True,
             capture_output=True,
             text=True,
@@ -502,6 +502,63 @@ def restrict_local_logon_access():
     except Exception as e:
         print(f"예기치 않은 오류가 발생했습니다: {e}\n")
 
+    finally:
+        cleanup_security_policy_files(desktop_path, export_cfg_path)
+
+
+# 익명 SID/이름 변환 허용 해제 설정
+# 보안 정책 설정 LSAAnoymousNameLookup 0
+def revoke_anonymous_sid_name_translation():
+    print("익명 SID/이름 변환 허용 해제 설정을 시작합니다.")
+
+    desktop_path = os.path.join(os.path.join(os.environ["USERPROFILE"]), "Desktop")
+    export_cfg_path = os.path.join(desktop_path, "cfg.txt")
+
+    try:
+        export_security_settings(export_cfg_path)
+
+        print("파일에서 'LSAAnonymousNameLookup' 설정을 '0'으로 변경합니다.")
+        with open(export_cfg_path, "r", encoding="utf-16") as f:
+            lines = f.readlines()
+        found = False
+        section_found = False
+
+        # secedit은 UTF-8 (BOM 없음) 또는 UTF-16으로 다시 읽을 수 있습니다.
+        # 기존 코드의 방식을 따라 UTF-8로 씁니다.
+        with open(export_cfg_path, "w", encoding="utf-8", errors="ignore") as f:
+            for line in lines:
+                if "[System Access]" in line:
+                    section_found = True
+
+                if "LSAAnonymousNameLookup" in line:
+                    f.write("LSAAnonymousNameLookup = 0\n")
+                    found = True
+                else:
+                    f.write(line)
+
+            # [System Access] 섹션이나 설정값이 아예 없는 경우
+            if not found:
+                if not section_found:
+                    f.write("\n[System Access]\n")
+                f.write("LSAAnonymousNameLookup = 0\n")
+
+        print("수정된 정책 파일을 시스템에 적용합니다.")
+        subprocess.run(
+            ["secedit", "/configure", "/db", "cfg.sdb", "/cfg", export_cfg_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="cp949",
+        )
+        print("익명 SID/이름 변환 허용 해제 설정이 성공적으로 적용되었습니다.\n")
+
+    except subprocess.CalledProcessError as e:
+        print(f"정책 적용 실패: {e.stderr.strip()}")
+        print("오류 원인: 관리자 권한으로 실행되었는지 확인하십시오.\n")
+    except FileNotFoundError as e:
+        print(f"파일이 존재하지 않습니다: {e}\n")
+    except Exception as e:
+        print(f"예기치 않은 오류가 발생했습니다: {e}\n")
     finally:
         cleanup_security_policy_files(desktop_path, export_cfg_path)
 
