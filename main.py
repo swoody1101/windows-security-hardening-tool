@@ -20,6 +20,7 @@ from managements.account_management import (
     restrict_local_logon_access,
     revoke_anonymous_sid_name_translation,
     set_password_history_size,
+    restrict_rdp_user_group,
     restrict_blank_password_logon,
 )
 from managements.service_management import (
@@ -43,7 +44,7 @@ from managements.security_management import (
 )
 
 __project_name__ = "Windows Security Hardening Tool"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "LEE SANG U"
 
 
@@ -87,16 +88,14 @@ def show_info():
     restrict_local_logon_access()
     print("1.15. 익명 SID/이름 변환 허용 해제 설정")
     revoke_anonymous_sid_name_translation()
-
     print("1.16. 최근 암호 기억 설정 (설정값: 5)")
     set_password_history_size()
     print("1.17. 콘솔 로그온 시 로컬 계정에서 빈 암호 사용 제한 설정")
     restrict_blank_password_logon()
     print("1.18. 원격터미널 접속 가능한 사용자 그룹 제한 설정")
-
+    restrict_rdp_user_group()
     print("1.19. 암호 사용 기간 제한 없음 설정 비활성화")
     disable_password_never_expires()
-
     print()
 
     print("2. 서비스 관리")

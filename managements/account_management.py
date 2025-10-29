@@ -243,48 +243,6 @@ def revoke_anonymous_everyone_access():
         print(f"예상치 못한 오류 발생: {e}\n")
 
 
-# 암호 사용 기간 제한 없음 비활성화 설정
-def disable_password_never_expires():
-    user_list = get_user_list()
-
-    # 내장 계정 및 변경된 관리자 계정 제외
-    built_in_accounts = [
-        "Administrator",
-        "Guest",
-        "DefaultAccount",
-        "WDAGUtilityAccount",
-        "JLKAdmin",
-        "jlk",
-    ]
-    user_list = [user for user in user_list if user not in built_in_accounts]
-
-    if not user_list:
-        print("시스템에 사용자 계정이 존재하지 않습니다.\n")
-        return
-
-    for user in user_list:
-        try:
-            print(f"'{user} 계정의 암호사용 기간 제한 없음 설정을 비활성화합니다.")
-            subprocess.run(
-                [
-                    "powershell",
-                    "-Command",
-                    f"Set-LocalUser -Name '{user}' -PasswordNeverExpires $false",
-                ],
-                check=True,
-                capture_output=True,
-                text=True,
-                encoding="cp949",
-            )
-            print(
-                f"계정 '{user}'의 '암호 사용 기간 제한 없음' 설정이 비활성화되었습니다.\n"
-            )
-        except subprocess.CalledProcessError as e:
-            print(f"계정 '{user}'의 설정 변경 오류: {e.stderr.strip()}\n")
-        except Exception as e:
-            print(f"'{user}' 계정 처리 중 예기치 않은 오류 발생: {e}\n")
-
-
 # 계정 잠금 기간 및 다음 시간 후 계정 잠금 수를 원래대로 설정 60분으로 설정
 # 보안 정책 설정 LockoutBadCount 5, ResetLockoutCount = 60, LockoutDuration = 60
 def set_lockout_duration(
@@ -616,6 +574,7 @@ def restrict_blank_password_logon():
 
 
 # 원격터미널 접속 가능한 사용자 그룹 제한 설정
+# Administrators, jlkAdmin, jlk 계정만 허용
 def restrict_rdp_user_group():
     print("원격터미널 접속 가능한 사용자 그룹 제한 설정을 시작합니다.")
 
@@ -632,7 +591,9 @@ def restrict_rdp_user_group():
         with open(export_cfg_path, "w", encoding="utf-8", errors="ignore") as f:
             for line in lines:
                 if "SeRemoteInteractiveLogonRight" in line:
-                    f.write("SeRemoteInteractiveLogonRight = *S-1-5-32-544\n")
+                    f.write(
+                        "SeRemoteInteractiveLogonRight = *S-1-5-32-544,*S-1-5-21-*-500,*S-1-5-21-*-1001\n"
+                    )
                 else:
                     f.write(line)
 
@@ -658,3 +619,45 @@ def restrict_rdp_user_group():
 
     finally:
         cleanup_security_policy_files(desktop_path, export_cfg_path)
+
+
+# 암호 사용 기간 제한 없음 비활성화 설정
+def disable_password_never_expires():
+    user_list = get_user_list()
+
+    # 내장 계정 및 변경된 관리자 계정 제외
+    built_in_accounts = [
+        "Administrator",
+        "Guest",
+        "DefaultAccount",
+        "WDAGUtilityAccount",
+        "JLKAdmin",
+        "jlk",
+    ]
+    user_list = [user for user in user_list if user not in built_in_accounts]
+
+    if not user_list:
+        print("시스템에 사용자 계정이 존재하지 않습니다.\n")
+        return
+
+    for user in user_list:
+        try:
+            print(f"'{user} 계정의 암호사용 기간 제한 없음 설정을 비활성화합니다.")
+            subprocess.run(
+                [
+                    "powershell",
+                    "-Command",
+                    f"Set-LocalUser -Name '{user}' -PasswordNeverExpires $false",
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
+                encoding="cp949",
+            )
+            print(
+                f"계정 '{user}'의 '암호 사용 기간 제한 없음' 설정이 비활성화되었습니다.\n"
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"계정 '{user}'의 설정 변경 오류: {e.stderr.strip()}\n")
+        except Exception as e:
+            print(f"'{user}' 계정 처리 중 예기치 않은 오류 발생: {e}\n")
