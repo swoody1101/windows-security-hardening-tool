@@ -588,12 +588,11 @@ def restrict_rdp_user_group():
         print("파일에서 'SeRemoteInteractiveLogonRight' 설정을 수정합니다.")
         with open(export_cfg_path, "r", encoding="utf-16") as f:
             lines = f.readlines()
+
         with open(export_cfg_path, "w", encoding="utf-8", errors="ignore") as f:
             for line in lines:
                 if "SeRemoteInteractiveLogonRight" in line:
-                    f.write(
-                        "SeRemoteInteractiveLogonRight = *S-1-5-32-544,*S-1-5-21-*-500,*S-1-5-21-*-1001\n"
-                    )
+                    f.write("SeRemoteInteractiveLogonRight = Administrators,jlkAdmin,jlk\n")
                 else:
                     f.write(line)
 
