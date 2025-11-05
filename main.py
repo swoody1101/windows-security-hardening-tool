@@ -41,6 +41,7 @@ from managements.security_management import (
     restrict_anonymous_enumeration,
     check_autoadminlogon_status,
     configure_removable_media_policy,
+    configure_dos_attack_defense,
 )
 
 __project_name__ = "Windows Security Hardening Tool"
@@ -135,6 +136,9 @@ def show_info():
     check_autoadminlogon_status()
     print("4.7. 이동식 미디어 포맷 및 꺼내기 관리자 설정")
     configure_removable_media_policy()
+    print("4.8. Dos 공격 방어 레지스트리 설정")
+    configure_dos_attack_defense()
+    print()
 
     print("로컬 보안 정책 수정 사항을 반영합니다.")
     update_local_security_policy()
