@@ -307,3 +307,37 @@ def configure_removable_media_policy():
 
     finally:
         cleanup_security_policy_files(desktop_path, export_cfg_path)
+
+
+# Dos 공격 방어 레지스트리 설정
+# SynAttackProtect, EnableDeadGWDetect, KeepAliveTime, NoNameReleaseOnDemand 레지스트리 설정
+def configure_dos_attack_defense():
+    key_path = r"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"
+
+    try:
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            key_path,
+            0,
+            winreg.KEY_READ | winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
+
+        print("SynAttackProtect 값을 2로 설정합니다.")
+        winreg.SetValueEx(reg_key, "SynAttackProtect", 0, winreg.REG_DWORD, 2)
+
+        print("EnableDeadGWDetect 값을 0으로 설정합니다.")
+        winreg.SetValueEx(reg_key, "EnableDeadGWDetect", 0, winreg.REG_DWORD, 0)
+
+        print("KeepAliveTime 값을 300000으로 설정합니다.")
+        winreg.SetValueEx(reg_key, "KeepAliveTime", 0, winreg.REG_DWORD, 300000)
+
+        print("NoNameReleaseOnDemand 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "NoNameReleaseOnDemand", 0, winreg.REG_DWORD, 1)
+
+        winreg.CloseKey(reg_key)
+        print("Dos 공격 방어 레지스트리 설정이 성공적으로 완료되었습니다.\n")
+
+    except FileNotFoundError:
+        print(f"오류: 레지스트리 키 '{key_path}'를 찾을 수 없습니다.\n")
+    except Exception as e:
+        print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")
