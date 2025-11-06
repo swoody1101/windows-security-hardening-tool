@@ -386,3 +386,37 @@ def configure_session_idle_timeout():
         print(f"오류: 레지스트리 키 '{key_path}'를 찾을 수 없습니다.\n")
     except Exception as e:
         print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")
+
+
+# 로그온 경고 메시지 설정
+def configure_logon_warning_message():
+    key_path = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+    value_name_caption = "LegalNoticeCaption"
+    value_name_text = "LegalNoticeText"
+    warning_caption = "경고"
+    warning_text = (
+        "이 컴퓨터 시스템은 승인된 사용자만 사용할 수 있습니다. "
+        "무단 액세스는 법적 조치를 받을 수 있습니다."
+    )
+
+    try:
+        reg_key = winreg.CreateKeyEx(
+            winreg.HKEY_LOCAL_MACHINE,
+            key_path,
+            0,
+            winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
+
+        print(f"'{value_name_caption}' 값을 설정합니다.")
+        winreg.SetValueEx(
+            reg_key, value_name_caption, 0, winreg.REG_SZ, warning_caption
+        )
+
+        print(f"'{value_name_text}' 값을 설정합니다.")
+        winreg.SetValueEx(reg_key, value_name_text, 0, winreg.REG_SZ, warning_text)
+
+        winreg.CloseKey(reg_key)
+        print("로그온 경고 메시지 설정이 성공적으로 완료되었습니다.\n")
+
+    except Exception as e:
+        print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")
