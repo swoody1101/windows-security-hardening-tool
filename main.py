@@ -43,6 +43,7 @@ from managements.security_management import (
     configure_removable_media_policy,
     configure_dos_attack_defense,
     configure_printer_driver_installation_restriction,
+    configure_session_idle_timeout,
 )
 
 __project_name__ = "Windows Security Hardening Tool"
@@ -141,6 +142,9 @@ def show_info():
     configure_dos_attack_defense()
     print("4.9. 사용자가 프린트 드라이버를 설치하지 못하도록 설정")
     configure_printer_driver_installation_restriction()
+    print("4.10. 세션 연결을 중단하기 전에 필요한 유휴시간 설정 (설정값: 15분)")
+    configure_session_idle_timeout()
+
     print()
 
     print("로컬 보안 정책 수정 사항을 반영합니다.")
