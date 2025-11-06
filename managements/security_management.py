@@ -358,3 +358,31 @@ def configure_printer_driver_installation_restriction():
 
     except Exception as e:
         print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")
+
+
+# 세션 연결을 중단하기 전에 필요한 유휴시간 설정 (설정값: 15분)
+# enableforcedlogoff 레지스트리 값을 1로 설정하고 autodisconnect 값을 15로 설정
+def configure_session_idle_timeout():
+    key_path = r"SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters"
+
+    try:
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            key_path,
+            0,
+            winreg.KEY_READ | winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
+
+        print("enableforcedlogoff 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "enableforcedlogoff", 0, winreg.REG_DWORD, 1)
+
+        print("autodisconnect 값을 15으로 설정합니다.")
+        winreg.SetValueEx(reg_key, "autodisconnect", 0, winreg.REG_DWORD, 15)
+
+        winreg.CloseKey(reg_key)
+        print("세션 유휴시간 설정이 성공적으로 완료되었습니다.\n")
+
+    except FileNotFoundError:
+        print(f"오류: 레지스트리 키 '{key_path}'를 찾을 수 없습니다.\n")
+    except Exception as e:
+        print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")
