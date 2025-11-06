@@ -341,3 +341,20 @@ def configure_dos_attack_defense():
         print(f"오류: 레지스트리 키 '{key_path}'를 찾을 수 없습니다.\n")
     except Exception as e:
         print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")
+
+
+# 사용자가 프린트 드라이버를 설치하지 못하도록 설정
+def configure_printer_driver_installation_restriction():
+    key_path = r"SYSTEM\CurrentControlSet\Control\Print\Providers\LanMan Print Services\Servers"
+
+    try:
+        reg_key = winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE, key_path)
+
+        print("AddPrinterDrivers 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "AddPrinterDrivers", 0, winreg.REG_DWORD, 1)
+
+        winreg.CloseKey(reg_key)
+        print("프린트 드라이버 설치 제한 설정이 성공적으로 완료되었습니다.\n")
+
+    except Exception as e:
+        print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")

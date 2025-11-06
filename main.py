@@ -42,6 +42,7 @@ from managements.security_management import (
     check_autoadminlogon_status,
     configure_removable_media_policy,
     configure_dos_attack_defense,
+    configure_printer_driver_installation_restriction,
 )
 
 __project_name__ = "Windows Security Hardening Tool"
@@ -138,6 +139,8 @@ def show_info():
     configure_removable_media_policy()
     print("4.8. Dos 공격 방어 레지스트리 설정")
     configure_dos_attack_defense()
+    print("4.9. 사용자가 프린트 드라이버를 설치하지 못하도록 설정")
+    configure_printer_driver_installation_restriction()
     print()
 
     print("로컬 보안 정책 수정 사항을 반영합니다.")
