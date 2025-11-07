@@ -44,6 +44,7 @@ from managements.security_management import (
     configure_dos_attack_defense,
     configure_printer_driver_installation_restriction,
     configure_session_idle_timeout,
+    configure_logon_warning_message,
 )
 
 __project_name__ = "Windows Security Hardening Tool"
@@ -144,7 +145,8 @@ def show_info():
     configure_printer_driver_installation_restriction()
     print("4.10. 세션 연결을 중단하기 전에 필요한 유휴시간 설정 (설정값: 15분)")
     configure_session_idle_timeout()
-
+    print("4.11. 로그온 경고 메시지 설정")
+    configure_logon_warning_message()
     print()
 
     print("로컬 보안 정책 수정 사항을 반영합니다.")
