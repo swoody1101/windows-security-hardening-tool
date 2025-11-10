@@ -148,7 +148,7 @@ def show_info():
     configure_session_idle_timeout()
     print("4.11. 로그온 경고 메시지 설정")
     configure_logon_warning_message()
-    print("4.12. LAN Manager 인증 수준 설정")
+    print("4.12. LAN Manager 인증 수준 설정 (설정값: NTLMv2 응답만 전송, LM & NTLM 거부)")
     configure_lan_manager_auth_level()
     print()
 
