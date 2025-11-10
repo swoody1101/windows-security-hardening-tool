@@ -420,3 +420,36 @@ def configure_logon_warning_message():
 
     except Exception as e:
         print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")
+
+
+# LAN Manager 인증 수준 설정
+def configure_lan_manager_auth_level():
+    key_path = r"SYSTEM\CurrentControlSet\Control\Lsa"
+    value_name = "LmCompatibilityLevel"
+    desired_value = 5  # NTLMv2 응답만 보내도록 설정
+
+    try:
+        reg_key = winreg.CreateKey(winreg.HKEY_LOCAL_MACHINE, key_path)
+
+        try:
+            current_value, _ = winreg.QueryValueEx(reg_key, value_name)
+            print(f"현재 '{value_name}' 값: {current_value}")
+        except FileNotFoundError:
+            current_value = None
+            print(f"현재 '{value_name}' 값이 존재하지 않습니다.")
+
+        if current_value is None or current_value != desired_value:
+            print(
+                f"'{value_name}' 값을 {desired_value}(NTLMv2 응답만)로 변경합니다."
+            )
+            winreg.SetValueEx(reg_key, value_name, 0, winreg.REG_DWORD, desired_value)
+            print(f"'{value_name}' 값이 성공적으로 {desired_value}로 설정되었습니다.\n")
+        else:
+            print(f"'{value_name}' 값이 이미 {desired_value}로 설정되어 있습니다.\n")
+
+    except Exception as e:
+        print(f"정책 설정 중 오류가 발생했습니다: {e}\n")
+
+    finally:
+        if reg_key:
+            winreg.CloseKey(reg_key)
