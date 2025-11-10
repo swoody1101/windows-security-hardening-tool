@@ -439,9 +439,7 @@ def configure_lan_manager_auth_level():
             print(f"현재 '{value_name}' 값이 존재하지 않습니다.")
 
         if current_value is None or current_value != desired_value:
-            print(
-                f"'{value_name}' 값을 {desired_value}(NTLMv2 응답만)로 변경합니다."
-            )
+            print(f"'{value_name}' 값을 {desired_value}(NTLMv2 응답만)로 변경합니다.")
             winreg.SetValueEx(reg_key, value_name, 0, winreg.REG_DWORD, desired_value)
             print(f"'{value_name}' 값이 성공적으로 {desired_value}로 설정되었습니다.\n")
         else:
@@ -453,3 +451,36 @@ def configure_lan_manager_auth_level():
     finally:
         if reg_key:
             winreg.CloseKey(reg_key)
+
+
+# 보안 채널 디지털 암호화 또는 서명 설정
+# RequireSignOrSeal, SealSecureChannel, SignSecureChannel 레지스트리 값을 1로 설정
+def configure_secure_channel_encryption():
+    key_path = r"SYSTEM\CurrentControlSet\Services\Netlogon\Parameters"
+
+    try:
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE,
+            key_path,
+            0,
+            winreg.KEY_READ | winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
+
+        print("RequireSignOrSeal 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "RequireSignOrSeal", 0, winreg.REG_DWORD, 1)
+
+        print("SealSecureChannel 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "SealSecureChannel", 0, winreg.REG_DWORD, 1)
+
+        print("SignSecureChannel 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "SignSecureChannel", 0, winreg.REG_DWORD, 1)
+
+        winreg.CloseKey(reg_key)
+        print(
+            "보안 채널 데이터 디지털 암호화 또는 서명 설정이 성공적으로 완료되었습니다.\n"
+        )
+
+    except FileNotFoundError:
+        print(f"오류: 레지스트리 키 '{key_path}'를 찾을 수 없습니다.\n")
+    except Exception as e:
+        print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")
