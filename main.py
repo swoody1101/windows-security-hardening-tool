@@ -45,7 +45,8 @@ from managements.security_management import (
     configure_printer_driver_installation_restriction,
     configure_session_idle_timeout,
     configure_logon_warning_message,
-    configure_lan_manager_auth_level
+    configure_lan_manager_auth_level,
+    configure_secure_channel_encryption,
 )
 
 __project_name__ = "Windows Security Hardening Tool"
@@ -148,8 +149,12 @@ def show_info():
     configure_session_idle_timeout()
     print("4.11. 로그온 경고 메시지 설정")
     configure_logon_warning_message()
-    print("4.12. LAN Manager 인증 수준 설정 (설정값: NTLMv2 응답만 전송, LM & NTLM 거부)")
+    print(
+        "4.12. LAN Manager 인증 수준 설정 (설정값: NTLMv2 응답만 전송, LM & NTLM 거부)"
+    )
     configure_lan_manager_auth_level()
+    print("4.13. 보안 채널 데이터 디지털 암호화 또는 서명 설정")
+    configure_secure_channel_encryption()
     print()
 
     print("로컬 보안 정책 수정 사항을 반영합니다.")
