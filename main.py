@@ -45,6 +45,7 @@ from managements.security_management import (
     configure_printer_driver_installation_restriction,
     configure_session_idle_timeout,
     configure_logon_warning_message,
+    configure_lan_manager_auth_level
 )
 
 __project_name__ = "Windows Security Hardening Tool"
@@ -147,6 +148,8 @@ def show_info():
     configure_session_idle_timeout()
     print("4.11. 로그온 경고 메시지 설정")
     configure_logon_warning_message()
+    print("4.12. LAN Manager 인증 수준 설정")
+    configure_lan_manager_auth_level()
     print()
 
     print("로컬 보안 정책 수정 사항을 반영합니다.")
