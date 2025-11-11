@@ -35,6 +35,7 @@ from managements.log_management import (
 )
 from managements.security_management import (
     secure_sam_file_permissions,
+    configure_screensaver_settings,
     configure_shutdown_policy,
     configure_remote_shutdown_privilege,
     configure_crash_on_audit_fail,
@@ -129,32 +130,35 @@ def show_info():
     print("4. 보안 관리")
     print("4.1. SAM 파일 접근 통제 설정")
     secure_sam_file_permissions()
-    print("4.2. 로그인하지 않고 시스템 종료 설정 비활성화 ")
+    print("4.2. 화면보호기 설정")
+    configure_screensaver_settings()
+    print("4.3. 로그인하지 않고 시스템 종료 설정 비활성화 ")
     configure_shutdown_policy()
-    print("4.3. 원격 시스템에서 강제 시스템 종료 설정 비활성화")
+    print("4.4. 원격 시스템에서 강제 시스템 종료 설정 비활성화")
     configure_remote_shutdown_privilege()
-    print("4.4. 보안 감사를 로그할 수 없을 경우 종료 설정 비활성화")
+    print("4.5. 보안 감사를 로그할 수 없을 경우 종료 설정 비활성화")
     configure_crash_on_audit_fail()
-    print("4.5. SAM 계정과 공유의 익명 열거 설정 비활성화")
+    print("4.6. SAM 계정과 공유의 익명 열거 설정 비활성화")
     restrict_anonymous_enumeration()
-    print("4.6. Autologon 설정 비활성화")
+    print("4.7. Autologon 설정 비활성화")
     check_autoadminlogon_status()
-    print("4.7. 이동식 미디어 포맷 및 꺼내기 관리자 설정")
+    print("4.8. 이동식 미디어 포맷 및 꺼내기 관리자 설정")
     configure_removable_media_policy()
-    print("4.8. Dos 공격 방어 레지스트리 설정")
+    print("4.9. Dos 공격 방어 레지스트리 설정")
     configure_dos_attack_defense()
-    print("4.9. 사용자가 프린트 드라이버를 설치하지 못하도록 설정")
+    print("4.10. 사용자가 프린트 드라이버를 설치하지 못하도록 설정")
     configure_printer_driver_installation_restriction()
-    print("4.10. 세션 연결을 중단하기 전에 필요한 유휴시간 설정 (설정값: 15분)")
+    print("4.11. 세션 연결을 중단하기 전에 필요한 유휴시간 설정 (설정값: 15분)")
     configure_session_idle_timeout()
-    print("4.11. 로그온 경고 메시지 설정")
+    print("4.12. 로그온 경고 메시지 설정")
     configure_logon_warning_message()
     print(
-        "4.12. LAN Manager 인증 수준 설정 (설정값: NTLMv2 응답만 전송, LM & NTLM 거부)"
+        "4.13. LAN Manager 인증 수준 설정 (설정값: NTLMv2 응답만 전송, LM & NTLM 거부)"
     )
     configure_lan_manager_auth_level()
-    print("4.13. 보안 채널 데이터 디지털 암호화 또는 서명 설정")
+    print("4.14. 보안 채널 데이터 디지털 암호화 또는 서명 설정")
     configure_secure_channel_encryption()
+
     print()
 
     print("로컬 보안 정책 수정 사항을 반영합니다.")
