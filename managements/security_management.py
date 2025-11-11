@@ -57,6 +57,46 @@ def secure_sam_file_permissions():
         print(f"예상치 못한 오류가 발생했습니다: {e}\n")
 
 
+# 화면보호기 설정
+# ScreenSaveActive, ScreenSaverIsSecure, SCRNSAVE.EXE, ScreenSaveTimeOut 레지스트리 값을 설정
+def configure_screensaver_settings():
+    key_path = r"Control Panel\Desktop"
+
+    try:
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER,
+            key_path,
+            0,
+            winreg.KEY_READ | winreg.KEY_SET_VALUE | winreg.KEY_WOW64_64KEY,
+        )
+
+        print("ScreenSaveActive 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "ScreenSaveActive", 0, winreg.REG_SZ, "1")
+
+        print("ScreenSaverIsSecure 값을 1로 설정합니다.")
+        winreg.SetValueEx(reg_key, "ScreenSaverIsSecure", 0, winreg.REG_SZ, "1")
+
+        print("SCRNSAVE.EXE 값을 'PhotoScreensaver.scr'로 설정합니다.")
+        winreg.SetValueEx(
+            reg_key,
+            "SCRNSAVE.EXE",
+            0,
+            winreg.REG_SZ,
+            "C:\Windows\System32\PhotoScreensaver.scr",
+        )
+
+        print("ScreenSaveTimeOut 값을 600으로 설정합니다.")
+        winreg.SetValueEx(reg_key, "ScreenSaveTimeOut", 0, winreg.REG_SZ, "600")
+
+        winreg.CloseKey(reg_key)
+        print("화면보호기 설정이 성공적으로 완료되었습니다.\n")
+
+    except FileNotFoundError:
+        print(f"오류: 레지스트리 키 '{key_path}'를 찾을 수 없습니다.\n")
+    except Exception as e:
+        print(f"레지스트리 값 변경 중 오류가 발생했습니다: {e}\n")
+
+
 # 로그인하지 않고 시스템 종료 비활성화 설정
 def configure_shutdown_policy():
     key_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
