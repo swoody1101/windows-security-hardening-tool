@@ -76,13 +76,13 @@ def configure_screensaver_settings():
         print("ScreenSaverIsSecure 값을 1로 설정합니다.")
         winreg.SetValueEx(reg_key, "ScreenSaverIsSecure", 0, winreg.REG_SZ, "1")
 
-        print("SCRNSAVE.EXE 값을 'PhotoScreensaver.scr'로 설정합니다.")
+        print("SCRNSAVE.EXE 값을 'scrnsave.scr'로 설정합니다.")
         winreg.SetValueEx(
             reg_key,
             "SCRNSAVE.EXE",
             0,
             winreg.REG_SZ,
-            "C:\Windows\System32\PhotoScreensaver.scr",
+            "C:\WINDOWS\system32\scrnsave.scr",
         )
 
         print("ScreenSaveTimeOut 값을 600으로 설정합니다.")
